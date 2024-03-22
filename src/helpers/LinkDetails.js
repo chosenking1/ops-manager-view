@@ -11,12 +11,13 @@ import { FaCloudBolt } from "react-icons/fa6";
 import { TbCloudDataConnection } from "react-icons/tb";
 import { RiCustomerService2Fill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
+import { HiUsers } from "react-icons/hi2";
 import logo from '../img/ibedc.jpg';
 
 export const mainLinks = [
     { name: "IBEDC", icon: logo, gap: true },
-    { name: 'Dashboard', link: '/' },
-    { name: 'Customers', link: '/customers' }, 
+    { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
+    { name: 'Customers', icon: HiUsers, link: '/customers' }, 
     { name: "Enumeration", icon: TiDocumentText },
     { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true },
     { name: "DT Meter Reading", icon: MdOutlineGasMeter },

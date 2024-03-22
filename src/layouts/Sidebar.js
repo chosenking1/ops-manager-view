@@ -2,24 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import apiUrl from '../apiConfig';
-import { mainLinks } from '../helpers/LinkDetails';
 
-import { HiUsers } from "react-icons/hi2";
-import { MdOutlineDashboard } from "react-icons/md";
-import { MdOutlineGasMeter } from "react-icons/md";
-import { TiDocumentText } from "react-icons/ti";
-import { IoDocumentTextOutline } from "react-icons/io5";
-import { ImUsers } from "react-icons/im";
-import { MdOutlineRoute } from "react-icons/md";
-import { MdInsights } from "react-icons/md";
-import { RxSpeakerModerate } from "react-icons/rx";
-import { FaPenSquare } from "react-icons/fa";
-import { FaCloudBolt } from "react-icons/fa6";
-import { TbCloudDataConnection } from "react-icons/tb";
-import { RiCustomerService2Fill } from "react-icons/ri";
-import { TbUsersGroup } from "react-icons/tb";
+
+
 import logo from '../img/ibedc.jpg';
-
+import { mainLinks } from '../helpers/LinkDetails';
 
 
 
@@ -31,28 +18,28 @@ const Sidebar = () => {
   ];
 
   // const [open, setOpen] = useState(true);
-  const menus = [
-    { name: "IBEDC", icon: logo, gap: true },
+  // const menus = [
+  //   { name: "IBEDC", icon: logo, gap: true },
 
-    { name: "Dashboard", icon: MdOutlineDashboard, link: "/" },
-    { name: "Customers ", icon: HiUsers, link: "/customers" },
-    { name: "Enumeration", icon: TiDocumentText },
-    { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true },
+  //   { name: "Dashboard", icon: MdOutlineDashboard, link: "/" },
+  //   { name: "Customers ", icon: HiUsers, link: "/customers" },
+  //   { name: "Enumeration", icon: TiDocumentText },
+  //   { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true },
 
-    { name: "DT Meter Reading", icon: MdOutlineGasMeter },
-    { name: "Bill Distribution", icon: MdOutlineDashboard },
-    { name: "DSS ", icon: IoDocumentTextOutline, gap: true },
-    { name: "CRO Management", icon: ImUsers },
-    { name: "CRO Route Map", icon: MdOutlineRoute },
-    { name: "Performance ", icon: MdInsights },
-    { name: "Evaluation", icon: RxSpeakerModerate },
-    { name: "MD Audit", icon: FaPenSquare, gap: true },
+  //   { name: "DT Meter Reading", icon: MdOutlineGasMeter },
+  //   { name: "Bill Distribution", icon: MdOutlineDashboard },
+  //   { name: "DSS ", icon: IoDocumentTextOutline, gap: true },
+  //   { name: "CRO Management", icon: ImUsers },
+  //   { name: "CRO Route Map", icon: MdOutlineRoute },
+  //   { name: "Performance ", icon: MdInsights },
+  //   { name: "Evaluation", icon: RxSpeakerModerate },
+  //   { name: "MD Audit", icon: FaPenSquare, gap: true },
 
-    { name: "Disconnection", icon: FaCloudBolt },
-    { name: "Reconnection", icon: TbCloudDataConnection },
-    { name: "DT Complaint ", icon: RiCustomerService2Fill, gap: true },
-    { name: "Customer Engagement", icon: TbUsersGroup },
-  ];
+  //   { name: "Disconnection", icon: FaCloudBolt },
+  //   { name: "Reconnection", icon: TbCloudDataConnection },
+  //   { name: "DT Complaint ", icon: RiCustomerService2Fill, gap: true },
+  //   { name: "Customer Engagement", icon: TbUsersGroup },
+  // ];
 
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('');

@@ -21,7 +21,10 @@ module.exports = {
         'login-text-color': '#374B58',
         'mygard-1':'#003057',
         'mygard-2': '#007CE0',
-        'user-name':'text-custom-blue'
+        'user-name':'text-custom-blue',
+        'dashboad-top': '#FAFDFF',
+        'dashboad-grid1': '#FAFAFA',
+        'dashboad-grid2': '#FFFBF5'
       },
     },
   },
