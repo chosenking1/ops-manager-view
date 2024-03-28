@@ -24,7 +24,8 @@ module.exports = {
         'user-name':'text-custom-blue',
         'dashboad-top': '#FAFDFF',
         'dashboad-grid1': '#FAFAFA',
-        'dashboad-grid2': '#FFFBF5'
+        'dashboad-grid2': '#FFFBF5',
+        'cutomer-table-header':'#F6F7F9'
       },
     },
   },
