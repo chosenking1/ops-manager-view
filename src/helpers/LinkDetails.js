@@ -19,7 +19,7 @@ export const mainLinks = [
     { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
     { name: 'Customers', icon: HiUsers, link: '/customers' }, 
     { name: "Enumeration", icon: TiDocumentText, link: '/enumeration' },
-    { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true },
+    { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true, link:'/meter-reading' },
     { name: "DT Meter Reading", icon: MdOutlineGasMeter },
     { name: "Bill Distribution", icon: MdOutlineDashboard, link: '/bill-distribution' },
     { name: "DSS ", icon: IoDocumentTextOutline, gap: true },

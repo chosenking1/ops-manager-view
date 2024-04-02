@@ -8,6 +8,7 @@ import Customers from "./components/customer/Customer";
 import Dashboard from "./components/dashboard/Dashboard";
 import Enumeration from './components/enumeration/Enumeration';
 import BillDistribution from './components/bill/BillDistribution';
+import MeterReading from './components/meter/MeterReading';
 
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
             <Route path="/register-user" element={< RegisterUser />} />
             <Route path="customers" element={< Customers />} />
             <Route path="enumeration" element={< Enumeration />} />
-            {/* <Route path="meter-reading" element={< MeterR />} /> */}
+            <Route path="meter-reading" element={< MeterReading />} />
             <Route path="bill-distribution" element={< BillDistribution />} />
           </Route>
 
