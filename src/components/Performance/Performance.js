@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
-import { tableHeader, tableRows } from '../../helpers/EnumerationData';
+import { HiUsers } from "react-icons/hi2";
+import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
 
-const Enumeration = () => {
+
+
+const Performance = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items to display per page
 
@@ -16,19 +19,43 @@ const Enumeration = () => {
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   return (
-    <div className="flex bg-white flex-col">
-      <div>
+    <div className="flex m-6 bg-white flex-col">
 
+
+      <div className="px-3 border mb-12">
+        <table className="w-full">
+          <thead>
+            <tr className="h-16">
+              {hubStatHeader.map(statHeader => (
+                <th key={statHeader} className="font-semibold text-sm px-4 text-base py-2 text-left text-login-text-color">
+                  {statHeader}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {hubStat.map((row, index) => (
+              <tr key={index} className="">
+                {Object.values(row).map((value, index) => (
+                  <td key={index} className="mx-20 px-4 py-2 text-left text-light-gery">
+                    {value}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="p-4 flex w-full h-20 justify-content justify-between">
-        <p className='text-xl font-semibold text-mygard-1'>Enumeration List</p>
+        <p className='text-xl font-semibold text-mygard-1'>Performance List</p>
         <button className="mx-12 w-[128px] item-center text-center text-white text-sm font-semibold  rounded-lg bg-custom-blue hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
           Download CSV
         </button>
 
       </div>
-      <div className='flex mb-6 justify-between mr-16' >
+
+      <div className='flex mb-6' >
 
         <div className="relative">
           <input className='m-2 p-4 pl-12 pr-4 text-sm text-gray-900 border border-light-gray rounded-lg dark:placeholder-light-gray dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Search' />
@@ -39,12 +66,11 @@ const Enumeration = () => {
             </svg>
           </div>
         </div>
-        <div>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 w-50 h-12 dark:focus:border-blue-500' placeholder='Filter by CRO' />
 
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='From ' />
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='To' />
-        </div>
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by CRO' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by Approval Status' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='From ' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To' />
       </div>
 
       <div className="px-3">
@@ -91,6 +117,7 @@ const Enumeration = () => {
       </div>
     </div>
   );
+
 };
 
-export default Enumeration;
+export default Performance;
