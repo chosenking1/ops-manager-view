@@ -10,7 +10,9 @@ function Login() {
 
   const handleSignIn = (event) => {
     event.preventDefault();
+    
     const formData = new FormData(event.target);
+    console.log(formData.get("email"));
     const credentials = {
       email: formData.get("email"),
       password: formData.get("password"),
@@ -21,7 +23,7 @@ function Login() {
       .then((response) => {
         const token = response.data.data.token;
         localStorage.setItem("token", token);
-        navigate('/task');
+        navigate('/');
       })
       .catch((error) => {
         console.error("Error logging in:", error);

@@ -47,7 +47,7 @@ const Enumeration = () => {
         </div>
       </div>
 
-      <div className="px-3">
+      <div className="px-3 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-cutomer-table-header h-16">

@@ -71,7 +71,7 @@ const BillDistribution = () => {
         <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To'/>
       </div>
 
-      <div className="px-3">
+      <div className="px-3 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-cutomer-table-header h-16">
