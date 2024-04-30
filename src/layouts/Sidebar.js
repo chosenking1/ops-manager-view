@@ -119,9 +119,7 @@ const Sidebar = () => {
             >
               
 
-              {menu?.icon === logo ? (
-                <img src={logo} alt="logo" className="h-12 w-12" />
-              ) : (
+              { (
                 <div>{React.createElement(menu?.icon, { size: "20" })}</div>
               )}
               <h2
