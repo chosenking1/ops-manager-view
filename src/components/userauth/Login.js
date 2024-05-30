@@ -19,9 +19,17 @@ function Login() {
     };
 
     axios
-      .post('/api/login', credentials)
+      .post('/api/auth/login', credentials,
+      {
+        headers:{
+          'Accept': 'application/vnd.api+json',
+          'tenant': 'root',
+          'Content-Type': 'application/vnd.api+json',
+        }
+      })
       .then((response) => {
-        const token = response.data.data.token;
+        console.log(response);
+        const token = response.data.token;
         localStorage.setItem("token", token);
         navigate('/');
       })

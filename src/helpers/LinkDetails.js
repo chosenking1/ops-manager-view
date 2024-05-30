@@ -12,7 +12,7 @@ import { TbCloudDataConnection } from "react-icons/tb";
 import { RiCustomerService2Fill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import { HiUsers } from "react-icons/hi2";
-import logo from '../img/ibedc.jpg';
+
 
 export const mainLinks = [
     { name: "IBEDC", icon: logo, gap: true },
