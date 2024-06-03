@@ -19,8 +19,16 @@ function Login() {
     };
 
     axios
-      .post('/api/login', credentials)
+      .post('/api/auth/login', credentials,
+      {
+        headers:{
+          'Accept': 'application/vnd.api+json',
+          'tenant': 'DISCO',
+          'Content-Type': 'application/vnd.api+json',
+        }
+      })
       .then((response) => {
+        console.log(response);
         const token = response.data.data.token;
         localStorage.setItem("token", token);
         navigate('/');

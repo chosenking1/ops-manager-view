@@ -5,7 +5,7 @@ import apiUrl from '../apiConfig';
 
 
 
-import logo from '../img/ibedc.jpg';
+import logo from '../img/log.svg';
 import { mainLinks } from '../helpers/LinkDetails';
 
 

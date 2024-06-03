@@ -27,24 +27,6 @@ const Navbar = () => {
 
   const [isSideMenuOpen, setMenu] = useState(false);
 
-  const navlinks = [
-    {
-      labe: "Collections",
-      link: "#"
-    },
-    {
-      labe: "Men",
-      link: "#"
-    },
-    {
-      labe: "About",
-      link: "#"
-    },
-    {
-      labe: "Contact",
-      link: "#"
-    }
-  ];
 
 
   const [open, setOpen] = useState(false);
