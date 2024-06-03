@@ -23,7 +23,7 @@ function Login() {
       {
         headers:{
           'Accept': 'application/vnd.api+json',
-          'tenant': 'DISCO',
+          'disco': 'root',
           'Content-Type': 'application/vnd.api+json',
         }
       })
