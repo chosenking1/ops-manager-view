@@ -23,13 +23,13 @@ function Login() {
       {
         headers:{
           'Accept': 'application/vnd.api+json',
-          'tenant': 'root',
+          'tenant': 'DISCO',
           'Content-Type': 'application/vnd.api+json',
         }
       })
       .then((response) => {
         console.log(response);
-        const token = response.data.token;
+        const token = response.data.data.token;
         localStorage.setItem("token", token);
         navigate('/');
       })

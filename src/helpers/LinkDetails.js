@@ -15,7 +15,7 @@ import { HiUsers } from "react-icons/hi2";
 
 
 export const mainLinks = [
-    { name: "IBEDC", icon: logo, gap: true },
+   
     { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
     { name: 'Customers', icon: HiUsers, link: '/customers' }, 
     { name: "Enumeration", icon: TiDocumentText, link: '/enumeration' },
