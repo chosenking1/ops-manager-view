@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
+import { HiUsers } from "react-icons/hi2";
 import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
 
 
 
-const BillDistribution = () => {
+const DtMeterReading = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items to display per page
 
@@ -47,7 +48,7 @@ const BillDistribution = () => {
       </div>
 
       <div className="p-4 flex w-full h-20 justify-content justify-between">
-        <p className='text-xl font-semibold text-mygard-1'>Bill History</p>
+        <p className='text-xl font-semibold text-mygard-1'>DT Meter Reading</p>
         <button className="mx-12 w-[128px] item-center text-center text-white text-sm font-semibold  rounded-lg bg-custom-blue hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
           Download CSV
         </button>
@@ -65,10 +66,11 @@ const BillDistribution = () => {
             </svg>
           </div>
         </div>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by CRO'/>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by Approval Status'/>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='From '/>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To'/>
+
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by CRO' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Filter by Approval Status' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='From ' />
+        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To' />
       </div>
 
       <div className="px-3 overflow-x-auto">
@@ -118,4 +120,4 @@ const BillDistribution = () => {
 
 };
 
-export default BillDistribution;
+export default DtMeterReading;

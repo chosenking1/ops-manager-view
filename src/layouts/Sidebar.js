@@ -102,9 +102,9 @@ const Sidebar = () => {
   };
   return (
 
-    <section className='w-50% flex'>
+    <section className='w-50% flex '>
       <div
-        className={`bg-gradient-to-b from-mygard-1  to-mygard-2 to-90% min-h-screen ${open ? "w-72" : "w-16"} duration-500 text-gray-100 px-4`}
+        className={`bg-gradient-to-b from-mygard-1  to-mygard-2 to-90% min-h-screen ${open ? "w-72" : "w-16"} duration-500 text-gray-100 px-4 	`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

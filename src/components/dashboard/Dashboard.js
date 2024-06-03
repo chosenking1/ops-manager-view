@@ -138,24 +138,7 @@ function Dashboard() {
             <p>2,452,523</p>
             <p>NMD Customer</p>
           </div>
-          <div className='bg-dashboad-grid1'>
-            <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
-            <p>2,452,523</p>
-            <p>Prepaid MD Customer</p>
-          </div>
-          <div className='bg-dashboad-grid1'>
-            <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"/>
-            <p>2,452,523</p>
-            <p>Postpaid Md Customers</p>
-          </div>
+          
           <div className='bg-dashboad-grid1'>
             <img width={70}
             height={70}
@@ -166,15 +149,7 @@ function Dashboard() {
             <p>Postpaid NMD Customer</p>
           </div>
 
-          <div className='bg-dashboad-grid1'>
-            <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
-            <p>2,452,523</p>
-            <p>Prepaid MD Customers</p>
-          </div>
+          
           <div className='bg-dashboad-grid1'>
             <img width={70}
             height={70}
