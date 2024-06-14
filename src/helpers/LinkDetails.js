@@ -12,17 +12,11 @@ import { TbCloudDataConnection } from "react-icons/tb";
 import { RiCustomerService2Fill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import { HiUsers } from "react-icons/hi2";
-<<<<<<< HEAD
+import { MdOutlineSettings } from "react-icons/md";
 // import logo from '../img/ibedc.jpg';
 
 export const mainLinks = [
     // { name: "IBEDC", icon: logo, gap: true },
-=======
-
-
-export const mainLinks = [
-   
->>>>>>> 858178e6a5b8257a836bdcda8f8b4dc41db4695b
     { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
     { name: 'Customers', icon: HiUsers, link: '/customers' }, 
     { name: "Enumeration", icon: TiDocumentText, link: '/enumeration' },
@@ -40,13 +34,14 @@ export const mainLinks = [
     { name: "Reconnection", icon: TbCloudDataConnection, link:'/reconnection' },
     { name: "DT Complaint ", icon: RiCustomerService2Fill, gap: true, link:'/dt-complaint' },
     { name: "Customer Engagement", icon: TbUsersGroup, link:'/customer-engagement' },
+    { name: "Settings", icon: MdOutlineSettings, dropdown: true, },
     // Add more main links as needed
   ];
 
 
   export const allLinks = [
     ...mainLinks,
-    { name: 'Collections', link: '#' },
+    { name: 'User Management', link: '/user-management', belongsTo:'Settings' },
     { name: 'Men', link: '#' },
     { name: 'About', link: '#' },
     { name: 'Contact', link: '#' },
