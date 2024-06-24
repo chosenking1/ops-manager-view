@@ -14,7 +14,7 @@ const MeterReading = () => {
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [meterReadings, setMeterReadings] = useState([]);
-  const [totalmeterReadings, setTotalMeterReadings] = useState('');
+  const [totalMeterReadings, setTotalMeterReadings] = useState('');
   const [headers, setHeaders] = useState([]);
   const [visibleHeaders, setVisibleHeaders] = useState([]);
   const location = useLocation();
@@ -26,10 +26,11 @@ const MeterReading = () => {
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableRows.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = meterReadings.slice(indexOfFirstItem, indexOfLastItem);
 
   // Pagination change
   const paginate = pageNumber => setCurrentPage(pageNumber);
+
   useEffect(() => {
     fetchMeterReadings();
 
@@ -139,21 +140,21 @@ const MeterReading = () => {
       <div className="p-4 flex w-full h-20 justify-content justify-between">
         <p className='w-full text-xl font-semibold text-mygard-1'>Meter Reading</p>
         <div className='flex w-full place-content-end'>
-        <button 
-        className=" place-content-center place-items-center h-full w-full max-w-[128px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
-          Download CSV
-        </button>
+          <button
+            className=" place-content-center place-items-center h-full w-full max-w-[128px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            Download CSV
+          </button>
 
-        <button onClick={openPreferencesModal} 
-          className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
-            <div 
-            className=""><MdOutlineSettingsSuggest /></div>
+          <button onClick={openPreferencesModal}
+            className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
+            <div
+              className=""><MdOutlineSettingsSuggest /></div>
             <div>Set Preference</div>
           </button>
-          </div>
+        </div>
       </div>
 
-      
+
 
       <div className='flex mb-6' >
 
