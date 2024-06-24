@@ -16,6 +16,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: theme => ({
+        'totalBg': "url('/src/img/totalbg.png')",
+      }),
       colors: {
         'custom-blue': '#003057',
         'login-text-color': '#374B58',
@@ -25,7 +28,7 @@ module.exports = {
         'dashboad-top': '#FAFDFF',
         'dashboad-grid1': '#FAFAFA',
         'dashboad-grid2': '#FFFBF5',
-        'cutomer-table-header':'#F6F7F9',
+        'cutomer-table-header':'rgba(122, 133, 148, 1)',
         'light-gery':'#4F4F4F'
       },
     },

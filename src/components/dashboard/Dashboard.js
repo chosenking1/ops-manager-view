@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiUrl from '../../apiConfig';
 import Image from "../../img/noun-electric-meter-4213733.svg";
+import { useAuth } from '../userauth/AuthContext';
 import Postpaid from "../../img/postpaid.jpg";
 import Prepaid from "../../img/meter.jpg";
 import Users from "../../img/users.jpg";
@@ -13,9 +14,21 @@ function Dashboard() {
   const navigate = useNavigate();
   axios.defaults.baseURL = apiUrl;
 
-  useEffect(() => {
-    fetchStaffTasks();
-  }, []);
+  //code checks if user is logged in
+  // const { isLoggedIn, isLoading } = useAuth();
+
+  // useEffect(() => {
+  //   if (isLoading) {
+  //     return; // Do nothing if still loading
+  //   }
+
+ 
+  //   if (!isLoggedIn) {
+  //     navigate('/login');
+  //   } else {
+  //     fetchStaffTasks();
+  //   }
+  // }, [isLoggedIn, isLoading, navigate]);
 
 
 
@@ -57,123 +70,123 @@ function Dashboard() {
       <div>
         <div className='flex grid grid-rows-4 grid-flow-col gap-5  bg-white shadow-2xl rounded-3xl p-10  '>
           <div className='pl-3 bg-dashboad-grid1 ml-1 pt-3 h-32'>
-            <img 
-            className="h-11 w-16 "
-            src = {Users}
-            alt="avatar-img"></img>
+            <img
+              className="h-11 w-16 "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Total Customer</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Last Month Total Bill</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Last Month Total Collection</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Active Customer</p>
           </div>
 
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>This Month Total Collection</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Prepaid}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Prepaid}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Prepaid Customers</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Postpaid}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Postpaid}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Postpaid Customers</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>MD Customers</p>
           </div>
 
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>NMD Customer</p>
           </div>
-          
+
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Postpaid NMD Customer</p>
           </div>
 
-          
+
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Suspended Customer</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Inactive Customer</p>
           </div>
           <div className='bg-dashboad-grid1'>
             <img width={70}
-            height={70}
-            className="h-11 w-16 rounded-full "
-            src = {Users}
-            alt="avatar-img"></img>
+              height={70}
+              className="h-11 w-16 rounded-full "
+              src={Users}
+              alt="avatar-img"></img>
             <p>2,452,523</p>
             <p>Total DSS</p>
           </div>

@@ -9,7 +9,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbLogout2 } from "react-icons/tb";
 import { IoNotificationsOutline } from "react-icons/io5";
-
+import { useAuth } from '../components/userauth/AuthContext';
 import Image from "../img/user.jpg";
 import { allLinks } from '../helpers/LinkDetails';
 
@@ -17,13 +17,6 @@ import { allLinks } from '../helpers/LinkDetails';
 
 
 const Navbar = () => {
-  const Links = [
-    { name: 'HOME', link: '/task' },
-    { name: 'CREATE TASK', link: '/task/create' },
-    { name: 'CREATE DEPARTMENT', link: '/department/create' },
-  ];
-
-
 
   const [isSideMenuOpen, setMenu] = useState(false);
 
@@ -31,7 +24,7 @@ const Navbar = () => {
 
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, logout } = useAuth(); 
   const location = useLocation();
   axios.defaults.baseURL = apiUrl;
   const [currentPage, setCurrentPage] = useState('');
@@ -39,18 +32,18 @@ const Navbar = () => {
   useEffect(() => {
     // Find the current page name based on the current location pathname
     const currentPageObj = allLinks.find(link => link.link === location.pathname);
-    setCurrentPage(currentPageObj ? currentPageObj.name : 'Unknown');
+    
+    if (currentPageObj && currentPageObj.belongsTo) {
+      // If the current page is a sublink, find its parent
+      const parentLink = allLinks.find(link => link.name === currentPageObj.belongsTo);
+      setCurrentPage(parentLink ? parentLink.name : 'Unknown');
+    } else {
+      setCurrentPage(currentPageObj ? currentPageObj.name : 'Unknown');
+    }
   }, [location.pathname]);
 
 
-  useEffect(() => {
-    const checkAuthentication = () => {
-      const token = localStorage.getItem('token');
-      setIsLoggedIn(!!token);
-    };
 
-    checkAuthentication();
-  }, [location]);
 
   const handleLogout = async () => {
     try {
@@ -63,11 +56,9 @@ const Navbar = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Remove the token from localStorage
-      localStorage.removeItem('token');
-      setIsLoggedIn(false);
+      logout();
       // Redirect to the signup page
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.log(error);
     }
@@ -91,15 +82,7 @@ const Navbar = () => {
               {currentPage}
             </div>
           </section>
-          {/* {navlinks.map((d, i) => (
-            <Link
-              key={i}
-              className="hidden lg:block  text-gray-400 hover:text-black"
-              to={d.link}
-            >
-              {d.labe}
-            </Link>
-          ))} */}
+          
         </div>
 
         {/* sidebar mobile menu */}
@@ -112,11 +95,7 @@ const Navbar = () => {
               className="mt-0 mb-8 text-3xl cursor-pointer"
             />
 
-            {/* {navlinks.map((d, i) => (
-              <Link key={i} className="font-bold" to={d.link}>
-                {d.labe}
-              </Link>
-            ))} */}
+           
           </section>
         </div>
 
@@ -137,7 +116,7 @@ const Navbar = () => {
           />
           <IoSettingsOutline className="text-3xl" />
 
-          <TbLogout2 className="text-3xl"/>
+          <TbLogout2 className="text-3xl" onClick={handleLogout} />
         </section>
       </nav>
       <hr className=" " />

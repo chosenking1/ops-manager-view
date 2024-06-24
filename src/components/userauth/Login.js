@@ -3,9 +3,11 @@ import apiUrl from '../../apiConfig';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from './img/ibedc.jpg';
+import { useAuth } from "./AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { setIsLoggedIn } = useAuth();
   axios.defaults.baseURL = apiUrl;
 
   const handleSignIn = (event) => {
@@ -31,6 +33,7 @@ function Login() {
         console.log(response);
         const token = response.data.data.token;
         localStorage.setItem("token", token);
+        setIsLoggedIn(true);
         navigate('/');
       })
       .catch((error) => {
