@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 import Navbar from './layouts/Navbar';
 import Login from "./components/userauth/Login";
-import RegisterUser from "./components/userauth/RegisterUser";
+import RegisterUser from "./components/settings/user-management/RegisterUser";
 import Customers from "./components/customer/Customer";
 import Dashboard from "./components/dashboard/Dashboard";
 import Enumeration from './components/enumeration/Enumeration';
@@ -53,7 +53,8 @@ function App() {
               <Route path="performance" element={< Performance />} />
               <Route path="md-audit" element={< MdAudit />} />
               <Route path="evaluation" element={< Evaluation />} />
-              <Route path="/user-management" element={< UserManagement />} />
+              <Route path="user-management" element={< UserManagement />} />
+              <Route path="register" element={< RegisterUser />}/>
             </Route>
           </Route>
 

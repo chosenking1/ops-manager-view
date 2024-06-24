@@ -17,13 +17,6 @@ import { allLinks } from '../helpers/LinkDetails';
 
 
 const Navbar = () => {
-  const Links = [
-    { name: 'HOME', link: '/task' },
-    { name: 'CREATE TASK', link: '/task/create' },
-    { name: 'CREATE DEPARTMENT', link: '/department/create' },
-  ];
-
-
 
   const [isSideMenuOpen, setMenu] = useState(false);
 
@@ -39,7 +32,14 @@ const Navbar = () => {
   useEffect(() => {
     // Find the current page name based on the current location pathname
     const currentPageObj = allLinks.find(link => link.link === location.pathname);
-    setCurrentPage(currentPageObj ? currentPageObj.name : 'Unknown');
+    
+    if (currentPageObj && currentPageObj.belongsTo) {
+      // If the current page is a sublink, find its parent
+      const parentLink = allLinks.find(link => link.name === currentPageObj.belongsTo);
+      setCurrentPage(parentLink ? parentLink.name : 'Unknown');
+    } else {
+      setCurrentPage(currentPageObj ? currentPageObj.name : 'Unknown');
+    }
   }, [location.pathname]);
 
 

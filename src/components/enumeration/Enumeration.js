@@ -40,10 +40,10 @@ const Enumeration = () => {
           </div>
         </div>
         <div>
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 w-50 h-12 dark:focus:border-blue-500' placeholder='Filter by CRO' />
+          <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 w-50 h-12 dark:focus:border-blue-500' placeholder='Filter by CRO' />
 
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='From ' />
-        <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='To' />
+          <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='From ' />
+          <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500 h-12 w-40' placeholder='To' />
         </div>
       </div>
 

@@ -13,13 +13,13 @@ import { RiCustomerService2Fill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import { HiUsers } from "react-icons/hi2";
 import { MdOutlineSettings } from "react-icons/md";
-// import logo from '../img/ibedc.jpg';
 
-export const mainLinks = [
+
+export const allIcons= [
     // { name: "IBEDC", icon: logo, gap: true },
-    { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
-    { name: 'Customers', icon: HiUsers, link: '/customers' }, 
-    { name: "Enumeration", icon: TiDocumentText, link: '/enumeration' },
+    { name: 'Dashboard', icon: MdOutlineDashboard, },
+    { name: 'Customers', icon: HiUsers,  }, 
+    { name: "Enumeration", icon: TiDocumentText,},
     { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true, link:'/meter-reading' },
     { name: "DT Meter Reading", icon: MdOutlineGasMeter, link:'/dt-meter-reading'},
     { name: "Bill Distribution", icon: MdOutlineDashboard, link: '/bill-distribution' },
@@ -36,15 +36,4 @@ export const mainLinks = [
     { name: "Customer Engagement", icon: TbUsersGroup, link:'/customer-engagement' },
     { name: "Settings", icon: MdOutlineSettings, dropdown: true, },
     // Add more main links as needed
-  ];
-
-
-  export const allLinks = [
-    ...mainLinks,
-    { name: 'User Management', link: '/user-management', belongsTo:'Settings' },
-    { name: 'Add New User', link: '/register', belongsTo:'User Management' },
-    { name: 'About', link: '#' },
-    { name: 'Contact', link: '#' },
-
-    // Add more links for the Navbar as needed
   ];
