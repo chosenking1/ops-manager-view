@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
-import { HiUsers } from "react-icons/hi2";
+import { useNavigate, useLocation, } from 'react-router-dom';
+import PreferenceModal from '../../helpers/PreferenceModal';
+import { MdOutlineSettingsSuggest } from "react-icons/md";
+
 import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
 
 
 
 const MeterReading = () => {
+  axios.defaults.baseURL = apiUrl;
+
+  const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const [meterReadings, setMeterReadings] = useState([]);
+  const [totalmeterReadings, setTotalMeterReadings] = useState('');
+  const [headers, setHeaders] = useState([]);
+  const [visibleHeaders, setVisibleHeaders] = useState([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items to display per page
 
@@ -17,6 +30,82 @@ const MeterReading = () => {
 
   // Pagination change
   const paginate = pageNumber => setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchMeterReadings();
+
+    // Load saved preferences from local storage
+    const savedPreferences = JSON.parse(localStorage.getItem('meterReadingTablePreferences'));
+    if (savedPreferences) {
+      setVisibleHeaders(savedPreferences);
+    }
+  }, []);
+
+  const fetchMeterReadings = () => {
+    const token = localStorage.getItem('token');
+
+    axios
+      .get('/api/meterReadings/search', {
+        headers: {
+          'Accept': 'application/vnd.api+json',
+          'disco': 'root',
+          'Content-Type': 'application/vnd.api+json',
+          'Authorization': `Bearer ${token}`
+        },
+      })
+      .then(response => {
+        const meterReadingData = response.data.data.data
+        const pageDetails = response.data.data
+        setMeterReadings(meterReadingData);
+        setTotalMeterReadings(pageDetails.totalCount);
+
+        // Extract headers
+        if (meterReadingData.length > 0) {
+          const headers = Object.keys(meterReadingData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
+          const formattedHeaders = headers.map(header => formatHeader(header));
+          setHeaders(headers);
+
+          if (!visibleHeaders.length) {
+            setVisibleHeaders(formattedHeaders.slice(0, 5));
+            // Set initial visible headers
+          }
+
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching Meter Readings:', error);
+      });
+  };
+
+  const formatHeader = (header) => {
+    return header
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase());
+  };
+
+  const openPreferencesModal = () => {
+    setIsPreferencesModalOpen(true);
+  };
+
+  const closePreferencesModal = () => {
+    setIsPreferencesModalOpen(false);
+  };
+
+  const savePreferences = (preferences) => {
+    setVisibleHeaders(preferences);
+    localStorage.setItem('meterReadingTablePreferences', JSON.stringify(preferences));
+    fetchMeterReadings(); // Re-fetch meterReadings to refresh data
+  };
+
+  const mapVisibleHeadersToOriginal = () => {
+    const headerMapping = {};
+    headers.forEach(header => {
+      headerMapping[formatHeader(header)] = header;
+    });
+
+    return headerMapping;
+  };
+
+  const headerMapping = mapVisibleHeadersToOriginal();
 
   return (
     <div className="flex m-6 bg-white flex-col">
@@ -48,12 +137,23 @@ const MeterReading = () => {
       </div>
 
       <div className="p-4 flex w-full h-20 justify-content justify-between">
-        <p className='text-xl font-semibold text-mygard-1'>Meter Reading</p>
-        <button className="mx-12 w-[128px] item-center text-center text-white text-sm font-semibold  rounded-lg bg-custom-blue hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+        <p className='w-full text-xl font-semibold text-mygard-1'>Meter Reading</p>
+        <div className='flex w-full place-content-end'>
+        <button 
+        className=" place-content-center place-items-center h-full w-full max-w-[128px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
           Download CSV
         </button>
 
+        <button onClick={openPreferencesModal} 
+          className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
+            <div 
+            className=""><MdOutlineSettingsSuggest /></div>
+            <div>Set Preference</div>
+          </button>
+          </div>
       </div>
+
+      
 
       <div className='flex mb-6' >
 
@@ -73,25 +173,32 @@ const MeterReading = () => {
         <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To' />
       </div>
 
+      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
+
       <div className="px-3 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-cutomer-table-header h-16">
-              {tableHeader.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">
-                  {header}
-                </th>
+              {visibleHeaders.map(header => (
+                <th key={header} className="font-medium text-base px-1 py-2">{header}</th>
               ))}
             </tr>
           </thead>
           <tbody className="border divide-y">
             {currentItems.map((row, index) => (
               <tr key={index} className="">
-                {Object.values(row).map((value, index) => (
-                  <td key={index} className="px-4 py-2">
-                    {value}
-                  </td>
-                ))}
+                {visibleHeaders.map(header => {
+                  const originalKey = headerMapping[header];
+                  if (originalKey === 'Status') {
+                    return (
+                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {row[originalKey] ? 'Yes' : 'No'}
+                      </td>
+                    );
+                  }
+
+                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
+                })}
               </tr>
             ))}
           </tbody>
@@ -100,7 +207,7 @@ const MeterReading = () => {
 
       {/* Pagination */}
       <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(tableRows.length / itemsPerPage) }).map(
+        {Array.from({ length: Math.ceil(meterReadings.length / itemsPerPage) }).map(
           (item, index) => (
             <button
               key={index}

@@ -16,6 +16,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: theme => ({
+        'totalBg': "url('/src/img/totalbg.png')",
+      }),
       colors: {
         'custom-blue': '#003057',
         'login-text-color': '#374B58',

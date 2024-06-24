@@ -45,7 +45,7 @@ const Customer = () => {
     fetchCustomers();
 
     // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('tablePreferences'));
+    const savedPreferences = JSON.parse(localStorage.getItem('customerTablePreferences'));
     if (savedPreferences) {
       setVisibleHeaders(savedPreferences);
     }
@@ -122,9 +122,9 @@ const Customer = () => {
   return (
     <div className="flex bg-white flex-col">
 
-      <div className='flex'>
-        <p className='pr-1'>Total Customer:</p>
-        <p>{totalCustomers}</p>
+      <div className="flex max-w-[865px]  w-full h-full bg-totalBg bg-no-repeat place-content-center place-items-center ">
+        <p className='pr-1 font-medium text-lg'>Total Customer:</p>
+        <p className='pr-1 font-semibold text-xl'>{totalCustomers}</p>
       </div>
       <div className="p-4 flex w-full min-h-20 justify-between  ">
 
@@ -150,14 +150,16 @@ const Customer = () => {
 
 
         <div className='flex place-content-end place-items-center w-full'>
-          <button onClick={openSearchModal} className=" flex place-content-center place-items-center h-full w-full max-w-[85px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+          <button
+            onClick={openSearchModal}
+            className=" flex place-content-center place-items-center h-full w-full max-w-[85px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
 
             <div>Filter</div>
             <div><MdKeyboardArrowDown /></div>
           </button>
 
-          <button onClick={openPreferencesModal} className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
-
+          <button onClick={openPreferencesModal} 
+          className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
             <div className=""><MdOutlineSettingsSuggest /></div>
             <div>Set Preference</div>
           </button>
