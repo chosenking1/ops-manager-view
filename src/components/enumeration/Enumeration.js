@@ -38,7 +38,7 @@ const Enumeration = () => {
   }, []);
 
   const fetchEnumerations = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/enumerations/search', {

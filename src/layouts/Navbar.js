@@ -47,8 +47,9 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       // Call the logout API
+      logout();
       await axios.post('/api/logout', null, {
         headers: {
           Accept: 'application/vnd.api+json',
@@ -56,7 +57,7 @@ const Navbar = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      logout();
+      
       // Redirect to the signup page
       navigate('/login');
     } catch (error) {

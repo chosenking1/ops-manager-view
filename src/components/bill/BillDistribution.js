@@ -41,7 +41,7 @@ const BillDistribution = () => {
   }, []);
 
   const fetchBillDistributed = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/billDistributions/search', {

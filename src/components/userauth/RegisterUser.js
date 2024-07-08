@@ -67,7 +67,7 @@ function RegisterUser() {
                 })
             .then((response) => {
                 const token = response.data.token;
-                localStorage.setItem("token", token);
+                sessionStorage.setItem("token", token);
                 navigate('/');
                 // Redirect the user to the dashboard or perform other actions after successful registration
                 // Example: history.push('/dashboard');
