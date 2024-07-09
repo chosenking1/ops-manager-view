@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import apiUrl from '../../apiConfig';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo from './img/ibedc.jpg';
+
 import { useAuth } from "./AuthContext";
 
 function Login() {
@@ -55,7 +55,7 @@ function Login() {
         <div className="w-1/3 rounded-3xl pl-28 items-left flex-col flex shadow-2xl bg-white">
 
           <div className="justify-left items-start mt-20 mb-8 ">
-            <h1 className="text-3xl text-lg font-semibold text-gray-800">Welcome Back</h1>
+            <h1 className="text-lg font-semibold text-gray-800">Welcome Back</h1>
             <p className="font-normal text-base text-gray-500">Enter your details below to login</p>
           </div>
           <form className="space-y-4 mt-4  mb-14 w-4/5" onSubmit={handleSignIn}>
