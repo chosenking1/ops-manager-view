@@ -14,26 +14,9 @@ function Dashboard() {
   const navigate = useNavigate();
   axios.defaults.baseURL = apiUrl;
 
-  //code checks if user is logged in
-  // const { isLoggedIn, isLoading } = useAuth();
-
-  // useEffect(() => {
-  //   if (isLoading) {
-  //     return; // Do nothing if still loading
-  //   }
-
- 
-  //   if (!isLoggedIn) {
-  //     navigate('/login');
-  //   } else {
-  //     fetchStaffTasks();
-  //   }
-  // }, [isLoggedIn, isLoading, navigate]);
-
-
 
   const fetchStaffTasks = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/task', {

@@ -25,6 +25,7 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState('1');
   const location = useLocation();
   const navigate = useNavigate();
+  
 
   const [itemsPerPage] = useState(10); // Number of items to display per page
 
@@ -50,7 +51,7 @@ const UserManagement = () => {
   }, [location.pathname]);
 
   const fetchUsers = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/users', {

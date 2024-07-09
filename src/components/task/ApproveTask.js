@@ -11,7 +11,7 @@ function ApproveTask() {
 
   useEffect(() => {
     const checkAuthentication = () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         // Redirect to the login page if the user is not authenticated
         navigate('/');
@@ -19,7 +19,7 @@ function ApproveTask() {
     };
 
   const fetchTask = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     axios.get(`/api/task/${id}`, {
       headers: {
         'Accept': 'application/vnd.api+json',

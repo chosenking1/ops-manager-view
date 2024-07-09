@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from 'react';
 import apiUrl from '../../apiConfig';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,12 +10,14 @@ function Login() {
   const navigate = useNavigate();
   const { setIsLoggedIn } = useAuth();
   axios.defaults.baseURL = apiUrl;
+  const [isLoading, setIsLoading] = useState(false); // State for loading
+
 
   const handleSignIn = (event) => {
     event.preventDefault();
-    
+    setIsLoading(true); // Set loading to true before login process
     const formData = new FormData(event.target);
-    console.log(formData.get("email"));
+
     const credentials = {
       email: formData.get("email"),
       password: formData.get("password"),
@@ -22,22 +25,25 @@ function Login() {
 
     axios
       .post('/api/auth/login', credentials,
-      {
-        headers:{
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-        }
-      })
+        {
+          headers: {
+            'Accept': 'application/vnd.api+json',
+            'disco': 'root',
+            'Content-Type': 'application/vnd.api+json',
+          }
+        })
       .then((response) => {
         console.log(response);
         const token = response.data.data.token;
-        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
         setIsLoggedIn(true);
         navigate('/');
       })
       .catch((error) => {
         console.error("Error logging in:", error);
+      })
+      .finally(() => {
+        setIsLoading(false); // Set loading to false after login process is completed
       });
   };
 
@@ -45,11 +51,6 @@ function Login() {
     <div className="antialiased bg-slate-900 ">
       <div className=" min-h-screen flex flex-col  bg-gray-100 sm:justify-center items-center">
 
-        <div className="  flex flex-col justify-center p-10 items-center ">
-          <img src={logo} alt="Logo" />
-        </div>
-
-        {/* <div className="flex bg-red-500 p-9 flex-col items-center justify-center mt-10"> */}
 
         <div className="w-1/3 rounded-3xl pl-28 items-left flex-col flex shadow-2xl bg-white">
 
@@ -73,10 +74,16 @@ function Login() {
               </div>
               <a href="#" className="text-sm text-indigo-600 hover:underline">Forgot password?</a>
             </div>
-            <button type="submit" className="w-full  py-2 px-4 bg-custom-blue hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-opacity-50 text-center text-white font-medium rounded-md text-sm shadow sm:shadow-sm">Login</button>
+            <button type="submit" className="w-full py-2 px-4 bg-custom-blue hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-opacity-50 text-center text-white font-medium rounded-md text-sm shadow sm:shadow-sm">
+              {isLoading ? (
+                'Loading...'
+              ) : (
+                'Login'
+              )}
+            </button>
           </form>
         </div>
-        {/* </div> */}
+
       </div>
     </div>
   );

@@ -18,14 +18,14 @@ export const AuthProvider = ({ children }) => {
   // Function to handle logout
   const logout = () => {
     // Perform logout logic, such as deleting token from local storage
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setIsLoggedIn(false);
   };
 
   // Function to handle login (if needed)
   // ...
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
       console.info(token);

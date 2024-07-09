@@ -115,14 +115,25 @@ const RegisterUser = () => {
                                 <input type="radio" id="serviceCenter" name="serviceCenter" value={filters.serviceCenter} onChange={handleChange} className="mt-1 p-2 border rounded-md " />
                                 <label htmlFor="serviceCenter" for="serviceCenter" className="block text-sm font-medium text-gray-700 w-full">Service Center:</label>
                             </div>
-                        </div>
 
-                    
+                        </div>
                     
 
                         <div className="mb-4">
-                            <label htmlFor="middleName" className="block text-sm font-medium text-gray-700">Current Bill Payment:</label>
-                            <input type="text" id="middleName" name="middleName" value={filters.middleName} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                            <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status:</label>
+                            <input type="text" id="status" name="status" value={filters.status} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="employmentQualification" className="block text-sm font-medium text-gray-700">Employment Qualification:</label>
+                            <input type="text" id="employmentQualification" name="employmentQualification" value={filters.employmentQualification} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="sex" className="block text-sm font-medium text-gray-700">Sex:</label>
+                            <input type="text" id="sex" name="sex" value={filters.sex} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="employmentStatus" className="block text-sm font-medium text-gray-700">Employment Status:</label>
+                            <input type="text" id="employmentStatus" name="employmentStatus" value={filters.employmentStatus} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
                         </div>
                     </div>
                     {/* Add more input fields for other filters */}

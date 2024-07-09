@@ -41,7 +41,7 @@ const Evaluation = () => {
   }, []);
 
   const fetchEvaluations = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/evaluations/search', {

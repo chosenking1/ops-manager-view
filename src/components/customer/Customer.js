@@ -24,7 +24,7 @@ const Customer = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -52,7 +52,7 @@ const Customer = () => {
   }, []);
 
   const fetchCustomers = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/customers', {
@@ -62,12 +62,17 @@ const Customer = () => {
           'Content-Type': 'application/vnd.api+json',
           'Authorization': `Bearer ${token}`
         },
+        params: {
+          'pageSize': 10
+        }
       })
       .then(response => {
         const customerData = response.data.data.data
         const pageDetails = response.data.data
         setCustomers(customerData);
         setTotalCustomers(pageDetails.totalCount);
+        setItemsPerPage(pageDetails.pageSize);
+        setCurrentPage(pageDetails.currentPage); // Reset page to 1 when fetching new data
 
         // Extract headers
         if (customerData.length > 0) {
@@ -203,7 +208,7 @@ const Customer = () => {
 
       {/* Pagination */}
       <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(customers.length / itemsPerPage) }).map(
+        {Array.from({ length: Math.ceil(totalCustomers / itemsPerPage) }).map(
           (item, index) => (
             <button
               key={index}

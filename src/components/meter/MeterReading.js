@@ -42,7 +42,7 @@ const MeterReading = () => {
   }, []);
 
   const fetchMeterReadings = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     axios
       .get('/api/meterReadings/search', {
