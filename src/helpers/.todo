@@ -2,3 +2,297 @@ TODO:
 Impliment Injection for the following:
 Storages and tables
 
+
+curl -X 'POST' \
+  'https://api.opsmanager.ng/api/auth/login' \
+  -H 'accept: application/json' \
+  -H 'disco: root' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "email": "admin@root.com",
+  "password": "123Pa$$word!"
+}
+
+
+{/* <table className="w-full">
+          <thead>
+            <tr className="bg-cutomer-table-header h-16">
+              {visibleHeaders.map(header => (
+                <th key={header} className="font-medium text-base px-4 py-2">{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="border divide-y">
+            {customers.map((row, index) => (
+              <tr key={index} className="">
+                {visibleHeaders.map(header => {
+                  const originalKey = headerMapping[header];
+                  if (originalKey === 'Status') {
+                    return (
+                      <td key={header} className={`pl-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {row[originalKey] ? 'Yes' : 'No'}
+                      </td>
+                    );
+                  }
+
+                  return <td key={header} className="pl-4 py-2">{row[originalKey]}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table> */}
+
+
+
+
+        import React, { useState, useEffect } from 'react';
+        import { useNavigate, useLocation } from 'react-router-dom';
+        import axios from 'axios';
+        import apiUrl from '../../apiConfig';
+        import SearchModal from './SearchModal';
+        import { MdOutlineSettingsSuggest, MdKeyboardArrowDown } from "react-icons/md";
+        import PreferenceModal from '../../helpers/PreferenceModal';
+        import Table from '../../helpers/Table';
+        
+        const Customer = () => {
+          axios.defaults.baseURL = apiUrl;
+        
+          const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+          const [customers, setCustomers] = useState([]);
+          const [totalCustomers, setTotalCustomers] = useState('');
+          const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+          const [headers, setHeaders] = useState([]);
+          const [visibleHeaders, setVisibleHeaders] = useState([]);
+          const [currentPage, setCurrentPage] = useState(1);
+          const [customersPageDetails, setCustomersPageDetails] = useState('');
+          const location = useLocation();
+          const navigate = useNavigate();
+          const preferenceTableName = 'tablePreferences'; // Updated to match PreferenceModal
+          const [itemsPerPage, setItemsPerPage] = useState(10);
+          const [isLoading, setIsLoading] = useState(true);
+        
+          const openSearchModal = () => {
+            setIsSearchModalOpen(true);
+          };
+        
+          const closeSearchModal = () => {
+            setIsSearchModalOpen(false);
+          };
+        
+          useEffect(() => {
+            fetchCustomers(currentPage, itemsPerPage);
+        
+            const savedPreferences = JSON.parse(localStorage.getItem(preferenceTableName));
+            if (savedPreferences) {
+              setVisibleHeaders(savedPreferences);
+            }
+          }, [currentPage, itemsPerPage]);
+        
+          const handlePageChange = (newPage) => {
+            setCurrentPage(newPage);
+          };
+        
+          const handleItemsPerPageChange = (event) => {
+            setItemsPerPage(parseInt(event.target.value, 10));
+            setCurrentPage(1);
+          };
+        
+          const handlePageInputChange = (event) => {
+            const value = event.target.value;
+            if (value === '' || (Number(value) >= 1 && Number(value) <= Math.ceil(totalCustomers / itemsPerPage))) {
+              setCurrentPage(Number(value));
+            }
+          };
+        
+          const fetchCustomers = async (page = currentPage, pageSize = itemsPerPage) => {
+            const token = sessionStorage.getItem('token');
+            setIsLoading(true);
+        
+            try {
+              const response = await axios.get('/api/customers', {
+                headers: {
+                  'Accept': 'application/vnd.api+json',
+                  'disco': 'root',
+                  'Content-Type': 'application/vnd.api+json',
+                  'Authorization': Bearer ${token}
+                },
+                params: {
+                  'pageNumber': page,
+                  'pageSize': pageSize,
+                }
+              });
+        
+              const customerData = response.data.data.data;
+              const pageDetails = response.data.data;
+        
+              setIsLoading(false);
+              setCustomersPageDetails(pageDetails);
+              setCustomers(customerData);
+              setTotalCustomers(pageDetails.totalCount);
+        
+              if (customerData.length > 0) {
+                const headers = Object.keys(customerData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
+                const formattedHeaders = headers.map(header => formatHeader(header));
+                setHeaders(headers);
+        
+                if (!visibleHeaders.length) {
+                  setVisibleHeaders(formattedHeaders.slice(0, 5));
+                }
+              }
+            } catch (error) {
+              console.error('Error fetching Customers:', error);
+              setIsLoading(false);
+            }
+          };
+        
+          const formatHeader = (header) => {
+            return header
+              .replace(/([A-Z])/g, ' $1')
+              .replace(/^./, str => str.toUpperCase());
+          };
+        
+          const openPreferencesModal = () => {
+            setIsPreferencesModalOpen(true);
+          };
+        
+          const closePreferencesModal = () => {
+            setIsPreferencesModalOpen(false);
+          };
+        
+          const savePreferences = (preferences) => {
+            setVisibleHeaders(preferences);
+            localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
+            fetchCustomers();
+          };
+        
+          const mapVisibleHeadersToOriginal = () => {
+            const headerMapping = {};
+            headers.forEach(header => {
+              headerMapping[formatHeader(header)] = header;
+            });
+            return headerMapping;
+          };
+        
+          const headerMapping = mapVisibleHeadersToOriginal();
+        
+          return (
+            <div className="flex bg-white flex-col">
+              <div className="flex max-w-[865px] w-full h-full bg-totalBg bg-no-repeat place-content-center place-items-center">
+                <p className='pr-1 font-medium text-lg'>Total Customer:</p>
+                <p className='pr-1 font-semibold text-xl'>{totalCustomers}</p>
+              </div>
+              <div className="p-4 flex w-full min-h-20 justify-between">
+                <div className="relative w-full flex max-w-[488px] items-center">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.81-4.81" />
+                      <circle cx="10.5" cy="10.5" r="7.5" />
+                    </svg>
+                  </div>
+                  <input
+                    className="w-full p-4 pl-12 pr-4 text-sm text-gray-900 border border-light-gray rounded-lg dark:placeholder-light-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Search"
+                  />
+                </div>
+                <div className='flex place-content-end place-items-center w-full'>
+                  <button
+                    onClick={openSearchModal}
+                    className="flex place-content-center place-items-center h-full w-full max-w-[85px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-300"
+                  >
+                    Search <MdKeyboardArrowDown className="ml-2 h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={openPreferencesModal}
+                    className="flex ml-4 place-content-center place-items-center h-full w-full max-w-[135px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-300"
+                  >
+                    Preference <MdOutlineSettingsSuggest className="ml-2 h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <Table
+                data={customers}
+                pageDetails={customersPageDetails}
+                preference={preferenceTableName}
+                updateData={fetchCustomers}
+              />
+              <PreferenceModal
+                isOpen={isPreferencesModalOpen}
+                onClose={closePreferencesModal}
+                headers={headers.map(formatHeader)}
+                onSave={savePreferences}
+              />
+              <SearchModal
+                isOpen={isSearchModalOpen}
+                onClose={closeSearchModal}
+              />
+            </div>
+          );
+        };
+        
+        export default Customer;
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import { IoMdCloseCircle } from "react-icons/io";
+
+const PreferenceModal = ({ isOpen, onClose, headers, onSave }) => {
+  const [selectedHeaders, setSelectedHeaders] = useState(headers);
+
+  useEffect(() => {
+    // Load saved preferences from local storage or use default headers
+    const savedPreferences = JSON.parse(localStorage.getItem('tablePreferences')) || headers;
+    setSelectedHeaders(savedPreferences);
+  }, [headers]);
+
+  const handleHeaderChange = (header) => {
+    setSelectedHeaders(prevState =>
+      prevState.includes(header)
+        ? prevState.filter(h => h !== header)
+        : [...prevState, header]
+    );
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('tablePreferences', JSON.stringify(selectedHeaders));
+    onSave(selectedHeaders);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={fixed inset-0 flex items-center justify-end bg-black bg-opacity-50 ${isOpen ? '' : 'hidden'}}>
+      <div className="bg-white px-6 mr-6 flex flex-col max-h-[85%] h-full rounded-lg">
+        <div className='flex justify-between pb-4 pt-4 text-[#003057]'>
+          <h2 className='font-semibold text-2xl pr-12'>Preference Settings</h2>
+          <button onClick={onClose} className='text-2xl'><IoMdCloseCircle /></button>
+        </div>
+        <form className='mr-12 font-medium text-sm'>
+          {headers.map(header => (
+            <div key={header}>
+              <input
+                type="checkbox"
+                id={header}
+                checked={selectedHeaders.includes(header)}
+                onChange={() => handleHeaderChange(header)}
+                className='mr-4 mb-4'
+              />
+              <label htmlFor={header}>{header}</label>
+            </div>
+          ))}
+        </form>
+        <button onClick={handleSave} className='bg-[#003057] text-[#FFFFFF] rounded-lg mt-14'>Apply</button>
+      </div>
+    </div>
+  );
+};
+
+export default PreferenceModal;

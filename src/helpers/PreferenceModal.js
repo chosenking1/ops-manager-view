@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { IoMdCloseCircle } from "react-icons/io";
 
-const PreferenceModal = ({ isOpen, onClose, headers, onSave }) => {
+const PreferenceModal = ({ isOpen, onClose, headers, onSave, preference }) => {
   const [selectedHeaders, setSelectedHeaders] = useState(headers);
 
   useEffect(() => {
     // Load saved preferences from local storage or use default headers
-    const savedPreferences = JSON.parse(localStorage.getItem('tablePreferences')) || headers;
+    const savedPreferences = JSON.parse(localStorage.getItem(preference)) || headers;
     setSelectedHeaders(savedPreferences);
   }, [headers]);
 
@@ -19,7 +19,7 @@ const PreferenceModal = ({ isOpen, onClose, headers, onSave }) => {
   };
 
   const handleSave = () => {
-    localStorage.setItem('tablePreferences', JSON.stringify(selectedHeaders));
+    localStorage.setItem(preference, JSON.stringify(selectedHeaders));
     onSave(selectedHeaders);
     onClose();
   };

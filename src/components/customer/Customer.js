@@ -1,17 +1,13 @@
-import React, { useState, useEffect, } from 'react';
-
-import { useNavigate, useLocation, } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
 import SearchModal from './SearchModal';
-import { MdOutlineSettingsSuggest } from "react-icons/md";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { MdOutlineSettingsSuggest, MdKeyboardArrowDown } from "react-icons/md";
 import PreferenceModal from '../../helpers/PreferenceModal';
-
-
+import Table from '../../helpers/Table';
 
 const Customer = () => {
-
   axios.defaults.baseURL = apiUrl;
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
@@ -20,16 +16,13 @@ const Customer = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [headers, setHeaders] = useState([]);
   const [visibleHeaders, setVisibleHeaders] = useState([]);
-  const [currentPage, setCurrentPage] = useState('1');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPageDetails, setCustomersPageDetails] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-
+  const preferenceTableName = 'customerTablePreferences';
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Pagination calculation
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = customers.slice(indexOfFirstItem, indexOfLastItem);
+  const [isLoading, setIsLoading] = useState(true);
 
   const openSearchModal = () => {
     setIsSearchModalOpen(true);
@@ -39,23 +32,23 @@ const Customer = () => {
     setIsSearchModalOpen(false);
   };
 
-  const paginate = pageNumber => setCurrentPage(pageNumber);
-
   useEffect(() => {
-    fetchCustomers();
+    fetchCustomers(currentPage, itemsPerPage);
 
-    // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('customerTablePreferences'));
+    const savedPreferences = JSON.parse(localStorage.getItem(preferenceTableName));
     if (savedPreferences) {
       setVisibleHeaders(savedPreferences);
     }
-  }, []);
+  }, [currentPage, itemsPerPage]);
 
-  const fetchCustomers = () => {
+ 
+
+  const fetchCustomers = async (page = currentPage, pageSize = itemsPerPage) => {
     const token = sessionStorage.getItem('token');
+    setIsLoading(true);
 
-    axios
-      .get('/api/customers', {
+    try {
+      const response = await axios.get('/api/customers', {
         headers: {
           'Accept': 'application/vnd.api+json',
           'disco': 'root',
@@ -63,33 +56,32 @@ const Customer = () => {
           'Authorization': `Bearer ${token}`
         },
         params: {
-          'pageSize': 10
+          'pageNumber': page,
+          'pageSize': pageSize,
         }
-      })
-      .then(response => {
-        const customerData = response.data.data.data
-        const pageDetails = response.data.data
-        setCustomers(customerData);
-        setTotalCustomers(pageDetails.totalCount);
-        setItemsPerPage(pageDetails.pageSize);
-        setCurrentPage(pageDetails.currentPage); // Reset page to 1 when fetching new data
-
-        // Extract headers
-        if (customerData.length > 0) {
-          const headers = Object.keys(customerData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-          const formattedHeaders = headers.map(header => formatHeader(header));
-          setHeaders(headers);
-
-          if (!visibleHeaders.length) {
-            setVisibleHeaders(formattedHeaders.slice(0, 5));
-            // Set initial visible headers
-          }
-
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching Customers:', error);
       });
+
+      const customerData = response.data.data.data;
+      const pageDetails = response.data.data;
+
+      setIsLoading(false);
+      setCustomersPageDetails(pageDetails);
+      setCustomers(customerData);
+      setTotalCustomers(pageDetails.totalCount);
+
+      if (customerData.length > 0) {
+        const headers = Object.keys(customerData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
+        const formattedHeaders = headers.map(header => formatHeader(header));
+        setHeaders(headers);
+
+        if (!visibleHeaders.length) {
+          setVisibleHeaders(formattedHeaders.slice(0, 5));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching Customers:', error);
+      setIsLoading(false);
+    }
   };
 
   const formatHeader = (header) => {
@@ -108,8 +100,8 @@ const Customer = () => {
 
   const savePreferences = (preferences) => {
     setVisibleHeaders(preferences);
-    localStorage.setItem('customerTablePreferences', JSON.stringify(preferences));
-    fetchCustomers(); // Re-fetch customers to refresh data
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
+    fetchCustomers();
   };
 
   const mapVisibleHeadersToOriginal = () => {
@@ -117,23 +109,19 @@ const Customer = () => {
     headers.forEach(header => {
       headerMapping[formatHeader(header)] = header;
     });
-
     return headerMapping;
   };
 
   const headerMapping = mapVisibleHeadersToOriginal();
 
-
   return (
     <div className="flex bg-white flex-col">
-
-      <div className="flex max-w-[865px]  w-full h-full bg-totalBg bg-no-repeat place-content-center place-items-center ">
+      <div className="flex max-w-[865px] w-full h-full bg-totalBg bg-no-repeat place-content-center place-items-center">
         <p className='pr-1 font-medium text-lg'>Total Customer:</p>
         <p className='pr-1 font-semibold text-xl'>{totalCustomers}</p>
       </div>
-      <div className="p-4 flex w-full min-h-20 justify-between  ">
-
-        <div className="relative w-full  flex max-w-[488px] items-center">
+      <div className="p-4 flex w-full min-h-20 justify-between">
+        <div className="relative w-full flex max-w-[488px] items-center">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg
               className="w-5 h-5 text-gray-400"
@@ -151,79 +139,29 @@ const Customer = () => {
             placeholder="Search"
           />
         </div>
-
-
-
         <div className='flex place-content-end place-items-center w-full'>
           <button
             onClick={openSearchModal}
-            className=" flex place-content-center place-items-center h-full w-full max-w-[85px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
-
+            className="flex place-content-center place-items-center h-full w-full max-w-[85px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring"
+          >
             <div>Filter</div>
             <div><MdKeyboardArrowDown /></div>
           </button>
-
-          <button onClick={openPreferencesModal} 
-          className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
+          <button 
+            onClick={openPreferencesModal}
+            className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12 max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold"
+          >
             <div className=""><MdOutlineSettingsSuggest /></div>
             <div>Set Preference</div>
           </button>
-
         </div>
       </div>
-
       <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
-
-      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
+      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} preference={preferenceTableName}/>
       <div className="px-3 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {visibleHeaders.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
-                    return (
-                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
-
-                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table data={customers} pageDetails={customersPageDetails} preference={preferenceTableName} updateData={fetchCustomers}/>
       </div>
-
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(totalCustomers / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
-      </div>
-    </div >
+    </div>
   );
 };
 

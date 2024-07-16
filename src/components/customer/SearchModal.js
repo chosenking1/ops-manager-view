@@ -6,6 +6,10 @@ const SearchModal = ({ isOpen, onClose }) => {
     const [filters, setFilters] = useState({
         region: '',
         hub: '',
+        ServiceCenter: '',
+        name: '',
+        phoneNumber: '',
+        ServiceCenter: '',
         // Add more filter fields as needed
     });
 
@@ -40,8 +44,8 @@ const SearchModal = ({ isOpen, onClose }) => {
                             <input type="text" id="hub" name="hub" value={filters.hub} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="region" className="block text-sm font-medium text-gray-700">Customer Name:</label>
-                            <input type="text" id="region" name="region" value={filters.region} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
+                            <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">Customer Name:</label>
+                            <input type="text" id="customerName" name="customerName" value={filters.region} onChange={handleChange} className="mt-1 p-2 border rounded-md w-full" />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="hub" className="block text-sm font-medium text-gray-700">Phone Number:</label>

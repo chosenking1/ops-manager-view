@@ -45,7 +45,7 @@ const MeterReading = () => {
     const token = sessionStorage.getItem('token');
 
     axios
-      .get('/api/meterReadings/search', {
+      .get('/api/meter-readings/search', {
         headers: {
           'Accept': 'application/vnd.api+json',
           'disco': 'root',
@@ -117,7 +117,7 @@ const MeterReading = () => {
           <thead>
             <tr className="h-16">
               {hubStatHeader.map(statHeader => (
-                <th key={statHeader} className="font-semibold text-sm px-4 text-base py-2 text-left text-login-text-color">
+                <th key={statHeader} className="font-semibold text-sm px-4  py-2 text-left text-login-text-color">
                   {statHeader}
                 </th>
               ))}
