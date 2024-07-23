@@ -24,6 +24,8 @@ import Evaluation from './components/evaluation/Evaluation';
 import { AuthProvider } from './components/userauth/AuthContext';
 import ProtectedRoute from './components/userauth/ProtectedRoute';
 import UserManagement from './components/settings/user-management/UserManagement';
+import { UtilityProvider } from './components/context/UtilityContext';
+import { HeaderProvider } from './components/context/HeaderContext';
 
 
 function App() {
@@ -36,8 +38,16 @@ function App() {
         <Routes>
           <Route path="/login" element={< Login />} />
           <Route path="/" element={<ProtectedRoute />}>
-            <Route element={<Layout />} >
+            <Route element={
+              <UtilityProvider>
+                <HeaderProvider>
+                <Layout />
+                </HeaderProvider>
+              </UtilityProvider>             
+              } >
+            
               <Route index element={< Dashboard />} />
+              
               <Route path="/register-user" element={< RegisterUser />} />
               <Route path="customers" element={< Customers />} />
               <Route path="enumeration" element={< Enumeration />} />
@@ -56,6 +66,7 @@ function App() {
               <Route path="evaluation" element={< Evaluation />} />
               <Route path="user-management" element={< UserManagement />} />
               <Route path="register" element={< RegisterUser />}/>
+              
             </Route>
           </Route>
 

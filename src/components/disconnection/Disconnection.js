@@ -1,22 +1,80 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import apiUrl from '../../apiConfig';
-import { HiUsers } from "react-icons/hi2";
-import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation, } from 'react-router-dom';
 
+import { hubStatHeader, hubStat } from '../../helpers/BillData';
+
+import { MdOutlineSettingsSuggest } from "react-icons/md";
+import PreferenceModal from '../../helpers/PreferenceModal';
+import Table from '../../helpers/Table';
+import { UtilityContext } from '../context/UtilityContext';
+import { HeaderContext } from '../context/HeaderContext';
+import ApiClient from '../../helpers/ApiClient';
 
 
 const Disconnection = () => {
+  const [disconnetions, setDisconnetions] = useState([]);
+  const [totalDisconnetions, setTotalDisconnetions] = useState('');
+
+  const { headers } = useContext(HeaderContext);
+  const { formatHeader } = useContext(UtilityContext);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  
+
+  const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const preferenceTableName = 'disconnectionTablePreferences';
+  const [disconnectionPageDetails, setDisconnectionPageDetails] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Number of items to display per page
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items to display per page
 
-  // Pagination calculation
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableRows.slice(indexOfFirstItem, indexOfLastItem);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Pagination change
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchDisconnetions();
+  }, [currentPage, itemsPerPage]);
+
+  const fetchDisconnetions = async (page = currentPage, pageSize = itemsPerPage) => {
+    setIsLoading(true);
+    const setItemsPerPage = pageSize;
+    const apiClient = new ApiClient({
+      url: '/api/disconnections',
+      headers: {
+        'disco': 'root',
+      },
+      params: {
+        'pageNumber': page,
+        'pageSize': pageSize,
+      },
+      onSuccess: (data) => {
+        setDisconnectionPageDetails(data.data);
+        setDisconnetions(data.data.data);
+        setTotalDisconnetions(data.data.totalCount);
+        setIsLoading(false);
+        setCurrentPage(page);
+      },
+      onError: (error) => {
+        console.error('Error fetching disconnections:', error);
+        setIsLoading(false);
+      },
+    });
+    apiClient.fetchData();
+  };
+
+  const openPreferencesModal = () => {
+    setIsPreferencesModalOpen(true);
+  };
+
+  const closePreferencesModal = () => {
+    setIsPreferencesModalOpen(false);
+  };
+
+  const savePreferences = (preferences) => {
+
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
+    fetchDisconnetions();
+  };
 
   return (
     <div className="flex m-6 bg-white flex-col">
@@ -27,7 +85,7 @@ const Disconnection = () => {
           <thead>
             <tr className="h-16">
               {hubStatHeader.map(statHeader => (
-                <th key={statHeader} className="font-semibold text-sm px-4 text-base py-2 text-left text-login-text-color">
+                <th key={statHeader} className="font-semibold  px-4 text-base py-2 text-left text-login-text-color">
                   {statHeader}
                 </th>
               ))}
@@ -48,11 +106,20 @@ const Disconnection = () => {
       </div>
 
       <div className="p-4 flex w-full h-20 justify-content justify-between">
-        <p className='text-xl font-semibold text-mygard-1'>Disconnection List</p>
-        <button className="mx-12 w-[128px] item-center text-center text-white text-sm font-semibold  rounded-lg bg-custom-blue hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
-          Download CSV
-        </button>
+        <p className='w-full text-xl font-semibold text-mygard-1'>Disconnection List</p>
+        <div className='flex w-full place-content-end'>
+          <button
+            className=" place-content-center place-items-center h-full w-full max-w-[128px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            Download CSV
+          </button>
 
+          <button onClick={openPreferencesModal}
+            className="w-full h-full flex place-content-center place-items-center ml-2 max-h-12, max-w-[150px] bg-custom-blue text-white rounded-lg text-sm font-semibold">
+            <div
+              className=""><MdOutlineSettingsSuggest /></div>
+            <div>Set Preference</div>
+          </button>
+        </div>
       </div>
 
       <div className='flex mb-6 ' >
@@ -72,48 +139,15 @@ const Disconnection = () => {
         <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='From ' />
         <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To' />
       </div>
+      
+      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 
       <div className="px-3 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {tableHeader.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {Object.values(row).map((value, index) => (
-                  <td key={index} className="px-4 py-2">
-                    {value}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(tableRows.length / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
+       <Table 
+        data={disconnetions}
+        pageDetails={disconnectionPageDetails}
+        preference={preferenceTableName}
+        updateData={fetchDisconnetions} />
       </div>
     </div>
   );

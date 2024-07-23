@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdOutlineSettingsSuggest } from "react-icons/md";
@@ -10,7 +10,11 @@ import PreferenceModal from '../../../helpers/PreferenceModal';
 import axios from 'axios';
 import apiUrl from '../../../apiConfig';
 
+import { UtilityContext } from '../../context/UtilityContext';
 import { allLinks } from '../../../helpers/LinkDetails';
+import ApiClient from '../../../helpers/ApiClient';
+import Table from '../../../helpers/Table';
+import { HeaderContext } from '../../context/HeaderContext';
 
 
 const UserManagement = () => {
@@ -19,20 +23,28 @@ const UserManagement = () => {
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
-  const [headers, setHeaders] = useState([]);
+  // const [headers, setHeaders] = useState([]);
   const [visibleHeaders, setVisibleHeaders] = useState([]);
   const [pageName, setPageName] = useState('');
   const [currentPage, setCurrentPage] = useState('1');
   const location = useLocation();
   const navigate = useNavigate();
-  
+  const preferenceTableName = 'userTablePreferences';
 
+  const { formatHeader } = useContext(UtilityContext)
+
+  const [isLoading, setLoading] = useState(true);
+  const [usersPageDetails, setUsersPageDetails] = useState('');
+
+  const [totaUsers, setTotalUsers] = useState('');
+
+  const { headers } = useContext(HeaderContext);
   const [itemsPerPage] = useState(10); // Number of items to display per page
 
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+ 
 
   // Pagination change
   const paginate = pageNumber => setCurrentPage(pageNumber);
@@ -43,53 +55,38 @@ const UserManagement = () => {
     const currentPageObj = allLinks.find(link => link.link === location.pathname);
     setPageName(currentPageObj ? currentPageObj.name : 'Unknown');
 
-    // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('tablePreferences'));
-    if (savedPreferences) {
-      setVisibleHeaders(savedPreferences);
-    }
-  }, [location.pathname]);
+   
+  }, [location.pathname,currentPage, itemsPerPage ]);
 
-  const fetchUsers = () => {
-    const token = sessionStorage.getItem('token');
+  const fetchUsers = async(page = currentPage, pageSize = itemsPerPage) => {
+    setLoading(true);
+    const apiClient = new ApiClient({
+      url: '/api/users',
+      headers: {
+        'disco': 'root',
+      },
+      params: {
+        'pageNumber': page,
+        'pageSize': pageSize,
+      },
+      onSuccess: (data) => {
 
-    axios
-      .get('/api/users', {
-        headers: {
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
-      })
-      .then(response => {
-        const userData = response.data.data
-        setUsers(userData);
-
-        // Extract headers
-        if (userData.length > 0) {
-          const headers = Object.keys(userData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-          const formattedHeaders = headers.map(header => formatHeader(header));
-          setHeaders(headers);
-          console.log('Real headers', headers);
-          if (!visibleHeaders.length) {
-            setVisibleHeaders(formattedHeaders.slice(0, 5));
-            console.log('Visible headers', visibleHeaders); // Set initial visible headers
-          }
-
-        }
-      })
-      .catch(error => {
+        setUsersPageDetails(data);
+        setUsers(data.data);
+        setTotalUsers(data.totalCount);
+        setLoading(false);
+        setCurrentPage(page);
+      },
+      onError: (error) => {
         console.error('Error fetching Users:', error);
-      });
+        setLoading(false);
+      },
+    });
+    apiClient.fetchData();
+      
   };
 
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
-
+ 
   const openPreferencesModal = () => {
     setIsPreferencesModalOpen(true);
   };
@@ -100,25 +97,25 @@ const UserManagement = () => {
 
   const savePreferences = (preferences) => {
     setVisibleHeaders(preferences);
-    localStorage.setItem('userTablePreferences', JSON.stringify(preferences));
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
     fetchUsers(); // Re-fetch users to refresh data
   };
 
-  const mapVisibleHeadersToOriginal = () => {
-    const headerMapping = {};
-    headers.forEach(header => {
-      headerMapping[formatHeader(header)] = header;
-    });
-    console.log('herder mapping headers', headerMapping);
-    return headerMapping;
-  };
+  // const mapVisibleHeadersToOriginal = () => {
+  //   const headerMapping = {};
+  //   headers.forEach(header => {
+  //     headerMapping[formatHeader(header)] = header;
+  //   });
+  //   // console.log('herder mapping headers', headerMapping);
+  //   return headerMapping;
+  // };
 
-  const headerMapping = mapVisibleHeadersToOriginal();
+  // const headerMapping = mapVisibleHeadersToOriginal();
 
   const addUser = () => {
     navigate(`/register`);
   };
-  
+
 
   return (
     <div className="flex bg-white flex-col w-full">
@@ -186,53 +183,13 @@ const UserManagement = () => {
 
         </div>
       </div>
-      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
-      <div className="px-3  overflow-x-auto">
-        <table className="w-full ">
-          <thead className=''>
-            <tr className="bg-cutomer-table-header border h-16 rounded-t-2xl ">
-              {visibleHeaders.map(header => (
-                <th key={header} className=" font-medium text-base px-1 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'isActive') {
-                    return (
-                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
-                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} preference={preferenceTableName} />
+      <div className="px-3 overflow-x-auto">
+        <Table data={users} pageDetails={usersPageDetails} preference={preferenceTableName} updateData={fetchUsers}/>
       </div>
+     
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(users.length / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
-      </div>
+     
     </div>
 
   );

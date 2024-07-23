@@ -33,7 +33,7 @@ function Login() {
           }
         })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         const token = response.data.data.token;
         sessionStorage.setItem("token", token);
         setIsLoggedIn(true);

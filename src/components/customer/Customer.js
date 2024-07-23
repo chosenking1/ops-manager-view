@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
-import apiUrl from '../../apiConfig';
+
 import SearchModal from './SearchModal';
 import { MdOutlineSettingsSuggest, MdKeyboardArrowDown } from "react-icons/md";
 import PreferenceModal from '../../helpers/PreferenceModal';
 import Table from '../../helpers/Table';
+import { UtilityContext } from '../context/UtilityContext';
+import { HeaderContext } from '../context/HeaderContext';
+import  ApiClient  from '../../helpers/ApiClient';
 
 const Customer = () => {
-  axios.defaults.baseURL = apiUrl;
+  
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [totalCustomers, setTotalCustomers] = useState('');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [headers, setHeaders] = useState([]);
-  const [visibleHeaders, setVisibleHeaders] = useState([]);
+
+  const { headers } = useContext(HeaderContext);
+  const { formatHeader } = useContext(UtilityContext);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPageDetails, setCustomersPageDetails] = useState('');
   const location = useLocation();
@@ -34,60 +38,36 @@ const Customer = () => {
 
   useEffect(() => {
     fetchCustomers(currentPage, itemsPerPage);
-
-    const savedPreferences = JSON.parse(localStorage.getItem(preferenceTableName));
-    if (savedPreferences) {
-      setVisibleHeaders(savedPreferences);
-    }
   }, [currentPage, itemsPerPage]);
 
  
 
   const fetchCustomers = async (page = currentPage, pageSize = itemsPerPage) => {
-    const token = sessionStorage.getItem('token');
+    // const token = sessionStorage.getItem('token');
+    setItemsPerPage(pageSize);
     setIsLoading(true);
+    const apiClient = new ApiClient({
+      url: '/api/customers',
+      headers: {
+        'disco' : 'root',},
+      params: {
+        'pageNumber': page,
+        'pageSize': pageSize,
+      },
+      onSuccess: (data) => {
+        
+        setCustomersPageDetails(data.data);
+        setCustomers(data.data.data);
+        setTotalCustomers(data.data.totalCount);
+        setIsLoading(false);
+        setCurrentPage(page);
+      },onError:(error) => {
+        console.error('Error fetching Customers:', error)
+        setIsLoading(false)
+      },
+    });
+    apiClient.fetchData();
 
-    try {
-      const response = await axios.get('/api/customers', {
-        headers: {
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
-        params: {
-          'pageNumber': page,
-          'pageSize': pageSize,
-        }
-      });
-
-      const customerData = response.data.data.data;
-      const pageDetails = response.data.data;
-
-      setIsLoading(false);
-      setCustomersPageDetails(pageDetails);
-      setCustomers(customerData);
-      setTotalCustomers(pageDetails.totalCount);
-
-      if (customerData.length > 0) {
-        const headers = Object.keys(customerData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-        const formattedHeaders = headers.map(header => formatHeader(header));
-        setHeaders(headers);
-
-        if (!visibleHeaders.length) {
-          setVisibleHeaders(formattedHeaders.slice(0, 5));
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching Customers:', error);
-      setIsLoading(false);
-    }
-  };
-
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
   };
 
   const openPreferencesModal = () => {
@@ -99,20 +79,12 @@ const Customer = () => {
   };
 
   const savePreferences = (preferences) => {
-    setVisibleHeaders(preferences);
+    
     localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
     fetchCustomers();
   };
 
-  const mapVisibleHeadersToOriginal = () => {
-    const headerMapping = {};
-    headers.forEach(header => {
-      headerMapping[formatHeader(header)] = header;
-    });
-    return headerMapping;
-  };
-
-  const headerMapping = mapVisibleHeadersToOriginal();
+  
 
   return (
     <div className="flex bg-white flex-col">

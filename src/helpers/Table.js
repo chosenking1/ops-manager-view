@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { HeaderContext } from '../components/context/HeaderContext';
+import { UtilityContext } from '../components/context/UtilityContext';
 
 const Table = ({ data, pageDetails, preference, updateData }) => {
   const [pageData, setPageData] = useState([]);
   const [totalData, setTotalData] = useState(0);
-  const [headers, setHeaders] = useState([]);
+  // const [headers, setHeaders] = useState([]);
+  // const {gettool} = useContext(HeaderContext)
+  // const [headers, setHeaders] = useState(gettool(data));
+  const { formatHeader } = useContext(UtilityContext);
+  const { headers, populateHeader } = useContext(HeaderContext);
+
   const [visibleHeaders, setVisibleHeaders] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,13 +40,16 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
           header => header !== 'id' && header !== 'emailConfirmed'
         );
         const formattedHeaders = extractedHeaders.map(header => formatHeader(header));
-        setHeaders(extractedHeaders);
-
+        // setHeaders(extractedHeaders);
+        populateHeader(data);
         const savedPreferences = JSON.parse(localStorage.getItem(preference));
         setVisibleHeaders(savedPreferences || formattedHeaders.slice(0, 5));
+        if (!savedPreferences) {
+          localStorage.setItem(preference, JSON.stringify(formattedHeaders.slice(0, 5)));
+        }
       }
     }
-  }, [data, pageDetails, preference]);
+  }, [data, pageDetails,]);
 
 
   const handlePageChange = (newPage) => {
@@ -64,11 +74,7 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
     }
   };
 
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
+
 
   const mapVisibleHeadersToOriginal = () => {
     const headerMapping = {};
@@ -81,29 +87,36 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
   const headerMapping = mapVisibleHeadersToOriginal();
 
   return (
- 
+
     <div className='overflow-x-auto'>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-blue-100 dark:text-blue-100">
-          <thead className="text-xs text-white uppercase bg-blue-600 dark:text-white">
+        <table className="w-full text-sm text-left rtl:text-right text-login-text-color ">
+          <thead className="text-xs text-white uppercase bg-cutomer-table-header dark:text-white">
             <tr>
               {visibleHeaders.map(header => (
-                <th key={header} scope="col" className="px-6 py-3">{header}</th>
+                <th key={header} scope="col" className="px-6 py-4">{header}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {pageData.map((row, index) => (
-              <tr key={index} className="bg-blue-500 border-b border-blue-400">
+              <tr key={index} className=" border-b border-[#E8EBEE]">
                 {visibleHeaders.map(header => {
                   const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
+                  
+
+                  if (row[originalKey] === true || row[originalKey] === false) {
                     return (
-                      <th key={header} scope="row" className={`px-6 py-4 font-medium ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      <th 
+                        key={header} 
+                        scope="row" 
+                        className={`px-6 py-4 font-medium ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                      >
                         {row[originalKey] ? 'Yes' : 'No'}
                       </th>
                     );
                   }
+
                   return <td key={header} className="px-6 py-4">{row[originalKey]}</td>;
                 })}
               </tr>

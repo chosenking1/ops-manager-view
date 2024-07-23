@@ -14,35 +14,14 @@ curl -X 'POST' \
 }
 
 
-{/* <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {visibleHeaders.map(header => (
-                <th key={header} className="font-medium text-base px-4 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {customers.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
-                    return (
-                      <td key={header} className={`pl-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
 
-                  return <td key={header} className="pl-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table> */}
-
-
+ // return (
+    //   <div>
+    //     {isLoading && <p>Loading data...</p>}
+    //     {error && <p>Error: {error.message}</p>}
+    //     {/* You can conditionally render the fetched data here if needed */}
+    //   </div>
+    // );
 
 
         import React, { useState, useEffect } from 'react';
@@ -296,3 +275,38 @@ const PreferenceModal = ({ isOpen, onClose, headers, onSave }) => {
 };
 
 export default PreferenceModal;
+
+
+
+    // try {
+    //   const response = await axios.get('/api/customers', {
+    //     headers: {
+    //       'Accept': 'application/vnd.api+json',
+    //       'disco': 'root',
+    //       'Content-Type': 'application/vnd.api+json',
+    //       'Authorization': `Bearer ${token}`
+    //     },
+    //     params: {
+    //       'pageNumber': page,
+    //       'pageSize': pageSize,
+    //     }
+    //   });
+
+      // const customerData = response.data.data.data;
+      // const pageDetails = response.data.data;
+
+      // setIsLoading(false);
+      // setCustomersPageDetails(pageDetails);
+      // setCustomers(customerData);
+      // setTotalCustomers(pageDetails.totalCount);
+
+      // if (customerData.length > 0) {
+      //   const headers = Object.keys(customerData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
+      //   const formattedHeaders = headers.map(header => formatHeader(header));
+      //   populateHeader(customerData);
+       
+      // }
+    // } catch (error) {
+    //   console.error('Error fetching Customers:', error);
+    //   setIsLoading(false);
+    // }

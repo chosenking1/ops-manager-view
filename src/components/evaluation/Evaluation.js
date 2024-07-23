@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
 import { useNavigate, useLocation, } from 'react-router-dom';
 import PreferenceModal from '../../helpers/PreferenceModal';
 import { MdOutlineSettingsSuggest } from "react-icons/md";
 
-import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
+import Table from '../../helpers/Table';
+import { UtilityContext } from '../context/UtilityContext';
+import { HeaderContext } from '../context/HeaderContext';
+import ApiClient from '../../helpers/ApiClient';
+
+import {  hubStatHeader, hubStat } from '../../helpers/BillData';
 
 
 
@@ -13,74 +18,56 @@ const Evaluation = () => {
   axios.defaults.baseURL = apiUrl;
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const preferenceTableName = 'evaluationTablePreferences';
   const [evaluations, setEvaluations] = useState([]);
   const [totalEvaluations, setTotalEvaluations] = useState('');
-  const [headers, setHeaders] = useState([]);
-  const [visibleHeaders, setVisibleHeaders] = useState([]);
+  const { headers } = useContext(HeaderContext);
+  const { formatHeader } = useContext(UtilityContext);
+
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [evaluationPageDetails, setEvaluationPageDetails] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Number of items to display per page
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items to display per page
 
-  // Pagination calculation
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = evaluations.slice(indexOfFirstItem, indexOfLastItem);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Pagination change
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+
+  // Fetch evaluations on component mount
   useEffect(() => {
     fetchEvaluations();
+  }, [currentPage, itemsPerPage]);
 
-    // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('evaluationTablePreferences'));
-    if (savedPreferences) {
-      setVisibleHeaders(savedPreferences);
-    }
-  }, []);
-
-  const fetchEvaluations = () => {
-    const token = sessionStorage.getItem('token');
-
-    axios
-      .get('/api/evaluations/search', {
-        headers: {
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
-      })
-      .then(response => {
-        const evaluationData = response.data.data.data
-        const pageDetails = response.data.data
-        setEvaluations(evaluationData);
-        setTotalEvaluations(pageDetails.totalCount);
-
-        // Extract headers
-        if (evaluationData.length > 0) {
-          const headers = Object.keys(evaluationData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-          const formattedHeaders = headers.map(header => formatHeader(header));
-          setHeaders(headers);
-
-          if (!visibleHeaders.length) {
-            setVisibleHeaders(formattedHeaders.slice(0, 5));
-            // Set initial visible headers
-          }
-
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching Evaluations:', error);
-      });
+  const fetchEvaluations = (page = currentPage, pageSize = itemsPerPage) => {
+   setIsLoading(true);
+   const itemsPerPage = pageSize;
+   const apiClient = new ApiClient({
+     url: '/api/evaluations/search',
+     headers: {
+       'disco': 'root',
+     },
+     params: {
+       'pageNumber': page,
+       'pageSize': pageSize,
+     },
+     onSuccess: (data) => {
+       setEvaluationPageDetails(data.data);
+       setEvaluations(data.data.data);
+       setTotalEvaluations(data.data.totalCount);
+       setIsLoading(false);
+       setCurrentPage(page);
+     },
+     onError: (error) => {
+       console.error('Error fetching evaluations:', error);
+       setIsLoading(false);
+     },
+   });
+   apiClient.fetchData();
   };
 
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
+  
 
   const openPreferencesModal = () => {
     setIsPreferencesModalOpen(true);
@@ -91,21 +78,11 @@ const Evaluation = () => {
   };
 
   const savePreferences = (preferences) => {
-    setVisibleHeaders(preferences);
-    localStorage.setItem('evaluationTablePreferences', JSON.stringify(preferences));
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
     fetchEvaluations(); // Re-fetch evaluations to refresh data
   };
 
-  const mapVisibleHeadersToOriginal = () => {
-    const headerMapping = {};
-    headers.forEach(header => {
-      headerMapping[formatHeader(header)] = header;
-    });
-
-    return headerMapping;
-  };
-
-  const headerMapping = mapVisibleHeadersToOriginal();
+ 
 
   return (
     <div className="flex m-6 bg-white flex-col">
@@ -116,7 +93,7 @@ const Evaluation = () => {
           <thead>
             <tr className="h-16">
               {hubStatHeader.map(statHeader => (
-                <th key={statHeader} className="font-semibold text-sm px-4 text-base py-2 text-left text-login-text-color">
+                <th key={statHeader} className="font-semibold  px-4 text-base py-2 text-left text-login-text-color">
                   {statHeader}
                 </th>
               ))}
@@ -176,51 +153,12 @@ const Evaluation = () => {
       <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 
       <div className="px-3 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {visibleHeaders.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
-                    return (
-                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
-
-                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(evaluations.length / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
+        <Table
+          data={evaluations}
+          pageDetails={evaluationPageDetails}
+          preference={preferenceTableName}
+          updateData={fetchEvaluations}
+        />
       </div>
     </div>
   );

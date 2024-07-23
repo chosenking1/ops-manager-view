@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
 import { useNavigate, useLocation, } from 'react-router-dom';
 import PreferenceModal from '../../helpers/PreferenceModal';
 import { MdOutlineSettingsSuggest } from "react-icons/md";
-import { tableHeader, tableRows, hubStatHeader, hubStat } from '../../helpers/BillData';
+import { hubStatHeader, hubStat } from '../../helpers/BillData';
 
-
+import Table from '../../helpers/Table';
+import { UtilityContext } from '../context/UtilityContext';
+import { HeaderContext } from '../context/HeaderContext';
+import  ApiClient  from '../../helpers/ApiClient';
 
 const BillDistribution = () => {
   axios.defaults.baseURL = apiUrl;
@@ -14,13 +17,18 @@ const BillDistribution = () => {
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [billDistributed, setBillDistributed] = useState([]);
   const [totalBillDistributed, setTotalBillDistributed] = useState('');
-  const [headers, setHeaders] = useState([]);
-  const [visibleHeaders, setVisibleHeaders] = useState([]);
+  const { headers } = useContext(HeaderContext);
+  const { formatHeader } = useContext(UtilityContext);
+
   const location = useLocation();
   const navigate = useNavigate();
+  const preferenceTableName = 'billDistributionTablePreferences';
 
+  const [billDistributionPageDetails, setBillDistributionPageDetails] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Number of items to display per page
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items to display per page
+  const [isLoading, setIsLoading] = useState(true);
+
 
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -32,55 +40,33 @@ const BillDistribution = () => {
 
   useEffect(() => {
     fetchBillDistributed();
+  }, [currentPage, itemsPerPage]);
 
-    // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('BillDistributionTablePreferences'));
-    if (savedPreferences) {
-      setVisibleHeaders(savedPreferences);
-    }
-  }, []);
-
-  const fetchBillDistributed = () => {
-    const token = sessionStorage.getItem('token');
-
-    axios
-      .get('/api/billDistributions/search', {
-        headers: {
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
-      })
-      .then(response => {
-        const billDistributedData = response.data.data.data
-        const pageDetails = response.data.data
-        setBillDistributed(billDistributedData);
-        setTotalBillDistributed(pageDetails.totalCount);
-
-        // Extract headers
-        if (billDistributedData.length > 0) {
-          const headers = Object.keys(billDistributedData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-          const formattedHeaders = headers.map(header => formatHeader(header));
-          setHeaders(headers);
-
-          if (!visibleHeaders.length) {
-            setVisibleHeaders(formattedHeaders.slice(0, 5));
-            // Set initial visible headers
-          }
-
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching Bills Distributed:', error);
-      });
+  const fetchBillDistributed = (page = currentPage, pageSize = itemsPerPage) => {
+    setIsLoading(true);
+    setItemsPerPage(pageSize);
+    const apiClient = new ApiClient({
+      url: '/api/bill-distributions/search',
+      headers: {
+        'disco' : 'root',},
+      params: {
+        'pageNumber': page,
+        'pageSize': pageSize,
+      },
+      onSuccess: (data) => {
+        setBillDistributionPageDetails(data.data);
+        setBillDistributed(data.data.data);
+        setTotalBillDistributed(data.data.total);
+        setIsLoading(false);
+        setCurrentPage(page);
+      },onError: (error) => {
+        setIsLoading(false);
+      }
+    });
+    apiClient.fetchData();
   };
 
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
+
 
   const openPreferencesModal = () => {
     setIsPreferencesModalOpen(true);
@@ -91,21 +77,12 @@ const BillDistribution = () => {
   };
 
   const savePreferences = (preferences) => {
-    setVisibleHeaders(preferences);
-    localStorage.setItem('billDistributedTablePreferences', JSON.stringify(preferences));
+    
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
     fetchBillDistributed(); // Re-fetch billDistributed to refresh data
   };
 
-  const mapVisibleHeadersToOriginal = () => {
-    const headerMapping = {};
-    headers.forEach(header => {
-      headerMapping[formatHeader(header)] = header;
-    });
 
-    return headerMapping;
-  };
-
-  const headerMapping = mapVisibleHeadersToOriginal();
 
   return (
     <div className="flex m-6 bg-white flex-col">
@@ -176,52 +153,10 @@ const BillDistribution = () => {
       <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 
       <div className="px-3 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {visibleHeaders.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
-                    return (
-                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
-
-                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table data={billDistributed} pageDetails={billDistributionPageDetails} preference={preferenceTableName} updateData={fetchBillDistributed} />
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(billDistributed.length / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
-      </div>
+      
     </div>
   );
 

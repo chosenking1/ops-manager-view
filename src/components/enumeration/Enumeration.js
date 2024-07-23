@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import apiUrl from '../../apiConfig';
 import { useNavigate, useLocation, } from 'react-router-dom';
 import PreferenceModal from '../../helpers/PreferenceModal';
 import { MdOutlineSettingsSuggest } from "react-icons/md";
+
+import Table from '../../helpers/Table';
+import { UtilityContext } from '../context/UtilityContext';
+import { HeaderContext } from '../context/HeaderContext';
+
+import ApiClient from '../../helpers/ApiClient';
+
 
 const Enumeration = () => {
   axios.defaults.baseURL = apiUrl;
@@ -11,14 +18,19 @@ const Enumeration = () => {
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [enumerations, setEnumerations] = useState([]);
   const [totalEnumerations, setTotalEnumerations] = useState('');
-  const [headers, setHeaders] = useState([]);
+  const { headers } = useContext(HeaderContext);
+  const { formatHeader } = useContext(UtilityContext);
   const [visibleHeaders, setVisibleHeaders] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Number of items to display per page
+  const [enumerationPageDetails, setEnumerationPageDetails] = useState('');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items to display per page
+  const [isLoading, setIsLoading] = useState(true);
+
+  const preferenceTableName = 'enumerationTablePreferences';
   // Pagination calculation
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -31,53 +43,39 @@ const Enumeration = () => {
     fetchEnumerations();
 
     // Load saved preferences from local storage
-    const savedPreferences = JSON.parse(localStorage.getItem('enumerationTablePreferences'));
+    const savedPreferences = JSON.parse(localStorage.getItem(preferenceTableName));
     if (savedPreferences) {
       setVisibleHeaders(savedPreferences);
     }
   }, []);
 
-  const fetchEnumerations = () => {
-    const token = sessionStorage.getItem('token');
-
-    axios
-      .get('/api/enumerations/search', {
-        headers: {
-          'Accept': 'application/vnd.api+json',
-          'disco': 'root',
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${token}`
-        },
-      })
-      .then(response => {
-        const enumerationData = response.data.data.data
-        const pageDetails = response.data.data
-        setEnumerations(enumerationData);
-        setTotalEnumerations(pageDetails.totalCount);
-
-        // Extract headers
-        if (enumerationData.length > 0) {
-          const headers = Object.keys(enumerationData[0]).filter(header => header !== 'id' && header !== 'emailConfirmed');
-          const formattedHeaders = headers.map(header => formatHeader(header));
-          setHeaders(headers);
-
-          if (!visibleHeaders.length) {
-            setVisibleHeaders(formattedHeaders.slice(0, 5));
-            // Set initial visible headers
-          }
-
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching Enumerations:', error);
-      });
+  const fetchEnumerations = (page = currentPage, pageSize = itemsPerPage) => {
+    setItemsPerPage(pageSize);
+    setIsLoading(true);
+    const apiClient = new ApiClient({
+      url: '/api/enumerations/search',
+      headers: {
+        'disco' : 'root',},
+      params: {
+        'pageNumber': page,
+        'pageSize': pageSize,
+      },
+      onSuccess: (data) => {
+        setEnumerationPageDetails(data.data);
+        setEnumerations(data.data.data);
+        setTotalEnumerations(data.data.totalCount);
+        setIsLoading(false);
+        setCurrentPage(page);
+      },
+      onError: (error) => {
+        console.error(error);
+        setIsLoading(false);
+      },
+    });
+    apiClient.fetchData();
   };
 
-  const formatHeader = (header) => {
-    return header
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
+ 
 
   const openPreferencesModal = () => {
     setIsPreferencesModalOpen(true);
@@ -89,20 +87,11 @@ const Enumeration = () => {
 
   const savePreferences = (preferences) => {
     setVisibleHeaders(preferences);
-    localStorage.setItem('enumerationTablePreferences', JSON.stringify(preferences));
+    localStorage.setItem(preferenceTableName, JSON.stringify(preferences));
     fetchEnumerations(); // Re-fetch enumerations to refresh data
   };
 
-  const mapVisibleHeadersToOriginal = () => {
-    const headerMapping = {};
-    headers.forEach(header => {
-      headerMapping[formatHeader(header)] = header;
-    });
-
-    return headerMapping;
-  };
-
-  const headerMapping = mapVisibleHeadersToOriginal();
+ 
 
 
   return (
@@ -151,51 +140,7 @@ const Enumeration = () => {
       <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 
       <div className="px-3 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-cutomer-table-header h-16">
-              {visibleHeaders.map(header => (
-                <th key={header} className="font-medium text-base px-1 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="border divide-y">
-            {currentItems.map((row, index) => (
-              <tr key={index} className="">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  if (originalKey === 'Status') {
-                    return (
-                      <td key={header} className={`px-4 py-2 ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </td>
-                    );
-                  }
-
-                  return <td key={header} className="px-4 py-2">{row[originalKey]}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: Math.ceil(enumerations.length / itemsPerPage) }).map(
-          (item, index) => (
-            <button
-              key={index}
-              onClick={() => paginate(index + 1)}
-              className={`mx-1 px-4 py-2 text-sm rounded-full ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'text-blue-500 border border-blue-500'
-                }`}
-            >
-              {index + 1}
-            </button>
-          )
-        )}
+      <Table data={enumerations} pageDetails={enumerationPageDetails} preference={preferenceTableName} updateData={fetchEnumerations}/>
       </div>
     </div>
   );
