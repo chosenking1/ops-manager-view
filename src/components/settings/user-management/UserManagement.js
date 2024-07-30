@@ -71,9 +71,9 @@ const UserManagement = () => {
       },
       onSuccess: (data) => {
 
-        setUsersPageDetails(data);
-        setUsers(data.data);
-        setTotalUsers(data.totalCount);
+        setUsersPageDetails(data.data);
+        setUsers(data.data.data);
+        setTotalUsers(data.dat.totalCount);
         setLoading(false);
         setCurrentPage(page);
       },

@@ -19,7 +19,7 @@ const ViewCustomer = () => {
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [customer, setcustomer] = useState([]);
-  const [totalcustomer, setTotalcustomer] = useState('');
+  
   const { headers } = useContext(HeaderContext);
   const { formatHeader } = useContext(UtilityContext);
   const id = parameters;
@@ -54,7 +54,7 @@ const ViewCustomer = () => {
       onSuccess: (data) => {
         setcustomer(data.data.data);
         setMeterReadingPageDetails(data.data);
-        setTotalcustomer(data.data.total);
+        
         setIsLoading(false);
         
       },

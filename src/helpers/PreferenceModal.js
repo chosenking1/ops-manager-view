@@ -33,12 +33,13 @@ const PreferenceModal = ({ isOpen, onClose, headers, onSave, preference }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-end bg-black bg-opacity-50">
-      <div className="bg-white px-6 mr-6 flex flex-col max-h-[85%] h-full rounded-lg">
-        <div className='flex justify-between pb-4 pt-4 text-[#003057]'>
-          <h2 className='font-semibold text-2xl pr-12'>Preference Settings</h2>
-          <button onClick={onClose} className='text-2xl'><IoMdCloseCircle /></button>
-        </div>
-        <form className='mr-12 font-medium text-sm'>
+    <div className="bg-white px-6 mr-6 flex flex-col max-h-[85%] h-full rounded-lg w-full max-w-lg overflow-y-auto">
+      <div className='flex justify-between pb-4 pt-4 text-[#003057]'>
+        <h2 className='font-semibold text-2xl pr-12'>Preference Settings</h2>
+        <button onClick={onClose} className='text-2xl'><IoMdCloseCircle /></button>
+      </div>
+      <div className="flex-1 overflow-y-auto mr-12">
+        <form className='font-medium text-sm'>
           {allHeaders.map(header => (
             <div key={header}>
               <input
@@ -52,9 +53,10 @@ const PreferenceModal = ({ isOpen, onClose, headers, onSave, preference }) => {
             </div>
           ))}
         </form>
-        <button onClick={handleSave} className='bg-[#003057] text-[#FFFFFF] rounded-lg mt-14'>Apply</button>
       </div>
+      <button onClick={handleSave} className='bg-[#003057] text-[#FFFFFF] rounded-lg mt-4'>Apply</button>
     </div>
+  </div>
   );
 };
 
