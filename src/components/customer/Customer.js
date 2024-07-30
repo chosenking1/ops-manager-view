@@ -36,13 +36,17 @@ const Customer = () => {
     setIsSearchModalOpen(false);
   };
 
+  const customerSearch = (search) => {
+    fetchCustomers(1, itemsPerPage, search);
+  };
+
   useEffect(() => {
     fetchCustomers(currentPage, itemsPerPage);
   }, [currentPage, itemsPerPage]);
 
  
 
-  const fetchCustomers = async (page = currentPage, pageSize = itemsPerPage) => {
+  const fetchCustomers = async (page = currentPage, pageSize = itemsPerPage, search) => {
     // const token = sessionStorage.getItem('token');
     setItemsPerPage(pageSize);
     setIsLoading(true);
@@ -53,6 +57,7 @@ const Customer = () => {
       params: {
         'pageNumber': page,
         'pageSize': pageSize,
+        ...search
       },
       onSuccess: (data) => {
         
@@ -128,7 +133,7 @@ const Customer = () => {
           </button>
         </div>
       </div>
-      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
+      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} search={customerSearch}  />
       <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} preference={preferenceTableName}/>
       <div className="px-3 overflow-x-auto">
         <Table data={customers} pageDetails={customersPageDetails} preference={preferenceTableName} updateData={fetchCustomers}/>

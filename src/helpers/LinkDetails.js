@@ -43,7 +43,7 @@ export const mainLinks = [
     ...mainLinks,
     { name: 'User Management', link: '/user-management', belongsTo:'Settings' },
     { name: 'Add New User', link: '/register', belongsTo:'User Management' },
-    { name: 'About', link: '#' },
+    { name: 'View Customer', link: '/view-customer/:id', belongsTo:'Customers' },
     { name: 'Contact', link: '#' },
 
     // Add more links for the Navbar as needed

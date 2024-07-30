@@ -26,6 +26,7 @@ import ProtectedRoute from './components/userauth/ProtectedRoute';
 import UserManagement from './components/settings/user-management/UserManagement';
 import { UtilityProvider } from './components/context/UtilityContext';
 import { HeaderProvider } from './components/context/HeaderContext';
+import ViewCustomer from './components/customer/ViewCustomer';
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
               <Route path="evaluation" element={< Evaluation />} />
               <Route path="user-management" element={< UserManagement />} />
               <Route path="register" element={< RegisterUser />}/>
+              <Route path="view-customer/:id" element={<ViewCustomer />} />
               
             </Route>
           </Route>
