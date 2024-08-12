@@ -16,7 +16,6 @@ const BillDistribution = () => {
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
   const [billDistributed, setBillDistributed] = useState([]);
-  const [totalBillDistributed, setTotalBillDistributed] = useState('');
   const { headers } = useContext(HeaderContext);
   const { formatHeader } = useContext(UtilityContext);
 
@@ -39,7 +38,7 @@ const BillDistribution = () => {
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   useEffect(() => {
-    fetchBillDistributed();
+    fetchBillDistributed(currentPage, itemsPerPage);
   }, [currentPage, itemsPerPage]);
 
   const fetchBillDistributed = (page = currentPage, pageSize = itemsPerPage) => {
@@ -56,7 +55,7 @@ const BillDistribution = () => {
       onSuccess: (data) => {
         setBillDistributionPageDetails(data.data);
         setBillDistributed(data.data.data);
-        setTotalBillDistributed(data.data.total);
+        
         setIsLoading(false);
         setCurrentPage(page);
       },onError: (error) => {
@@ -150,7 +149,7 @@ const BillDistribution = () => {
         <input className='m-2 p-4 ps-10 text-sm text-gray-900 border border-light-gery rounded-lg dark:placeholder-light-gery dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='To' />
       </div>
 
-      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
+      <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} preference={preferenceTableName} />
 
       <div className="px-3 overflow-x-auto">
         <Table data={billDistributed} pageDetails={billDistributionPageDetails} preference={preferenceTableName} updateData={fetchBillDistributed} />

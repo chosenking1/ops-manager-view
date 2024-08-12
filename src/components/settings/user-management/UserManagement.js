@@ -101,16 +101,6 @@ const UserManagement = () => {
     fetchUsers(); // Re-fetch users to refresh data
   };
 
-  // const mapVisibleHeadersToOriginal = () => {
-  //   const headerMapping = {};
-  //   headers.forEach(header => {
-  //     headerMapping[formatHeader(header)] = header;
-  //   });
-  //   // console.log('herder mapping headers', headerMapping);
-  //   return headerMapping;
-  // };
-
-  // const headerMapping = mapVisibleHeadersToOriginal();
 
   const addUser = () => {
     navigate(`/register`);

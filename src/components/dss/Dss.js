@@ -53,6 +53,7 @@ const Dss = () => {
         setTotalDss(data.data.totalCount);
         setIsLoading(false);
         setCurrentPage(page);
+        setItemsPerPage(pageSize);
       },
       onError: (error) => {
         console.error('Error fetching DSS:', error);

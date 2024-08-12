@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     const token = sessionStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
-      console.info(token);
+      // console.info(token);
       
     }
     setIsLoading(false); 

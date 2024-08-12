@@ -6,16 +6,12 @@ import { UtilityContext } from '../components/context/UtilityContext';
 const Table = ({ data, pageDetails, preference, updateData }) => {
   const [pageData, setPageData] = useState([]);
   const [totalData, setTotalData] = useState(0);
-  // const [headers, setHeaders] = useState([]);
-  // const {gettool} = useContext(HeaderContext)
-  // const [headers, setHeaders] = useState(gettool(data));
+  const [expandedRow, setExpandedRow] = useState(null); // New state for expanded row
   const { formatHeader } = useContext(UtilityContext);
   const { headers, populateHeader } = useContext(HeaderContext);
-
   const [visibleHeaders, setVisibleHeaders] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -26,9 +22,7 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
     }
   }, []);
 
-
   useEffect(() => {
-    // Fetch customers when customers or pageDetails change
     if (data && pageDetails) {
       setPageData(data);
       setTotalData(pageDetails.totalCount);
@@ -40,7 +34,6 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
           header => header !== 'id' && header !== 'emailConfirmed'
         );
         const formattedHeaders = extractedHeaders.map(header => formatHeader(header));
-        // setHeaders(extractedHeaders);
         populateHeader(data);
         const savedPreferences = JSON.parse(localStorage.getItem(preference));
         setVisibleHeaders(savedPreferences || formattedHeaders.slice(0, 5));
@@ -49,8 +42,7 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
         }
       }
     }
-  }, [data, pageDetails,]);
-
+  }, [data, pageDetails]);
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= Math.ceil(totalData / itemsPerPage)) {
@@ -74,7 +66,9 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
     }
   };
 
-
+  const toggleRow = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
 
   const mapVisibleHeadersToOriginal = () => {
     const headerMapping = {};
@@ -87,10 +81,9 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
   const headerMapping = mapVisibleHeadersToOriginal();
 
   return (
-
     <div className='overflow-x-auto'>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-login-text-color ">
+        <table className="w-full text-sm text-left rtl:text-right text-login-text-color">
           <thead className="text-xs text-white uppercase bg-cutomer-table-header dark:text-white">
             <tr>
               {visibleHeaders.map(header => (
@@ -100,26 +93,45 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
           </thead>
           <tbody>
             {pageData.map((row, index) => (
-              <tr key={index} className=" border-b border-[#E8EBEE]">
-                {visibleHeaders.map(header => {
-                  const originalKey = headerMapping[header];
-                  
+              <React.Fragment key={index}>
+                <tr
+                  className="border-b border-[#E8EBEE] cursor-pointer"
+                  onClick={() => toggleRow(index)}
+                >
+                  {visibleHeaders.map(header => {
+                    const originalKey = headerMapping[header];
+                    if (row[originalKey] === true || row[originalKey] === false) {
+                      return (
+                        <th
+                          key={header}
+                          scope="row"
+                          className={`px-6 py-4 font-medium ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                        >
+                          {row[originalKey] ? 'Yes' : 'No'}
+                        </th>
+                      );
+                    }
+                    return <td key={header} className="px-6 py-4">{row[originalKey]}</td>;
+                  })}
+                </tr>
+                {expandedRow === index && row.staffMembers && row.staffMembers.length > 0 && (
+                  <tr>
+                    <td colSpan={visibleHeaders.length}>
+                      <div className="p-4 bg-gray-100">
+                        <h4 className="font-bold mb-2">Team Members:</h4>
+                        <ul>
+                          {row.staffMembers.map((member) => (
+                            <li key={member.id} className="py-1">
+                              {member.name} (Staff Number: {member.staffNumber}) - Phone: {member.phone || 'N/A'}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                )}
 
-                  if (row[originalKey] === true || row[originalKey] === false) {
-                    return (
-                      <th 
-                        key={header} 
-                        scope="row" 
-                        className={`px-6 py-4 font-medium ${row[originalKey] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                      >
-                        {row[originalKey] ? 'Yes' : 'No'}
-                      </th>
-                    );
-                  }
-
-                  return <td key={header} className="px-6 py-4">{row[originalKey]}</td>;
-                })}
-              </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -158,22 +170,25 @@ const Table = ({ data, pageDetails, preference, updateData }) => {
         </div>
 
         <div className="flex justify-center">
-          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === Math.ceil(totalData / itemsPerPage)}>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === Math.ceil(totalData / itemsPerPage)}
+          >
             Next
           </button>
         </div>
+      </div>
 
-        <div className="flex justify-center">
-          <label>Go to:</label> &nbsp;
-          <input
-            type="number"
-            value={currentPage}
-            onChange={handlePageInputChange}
-            className="mx-2 px-2 py-1 border rounded"
-            min="1"
-            max={Math.ceil(totalData / itemsPerPage)}
-          />
-        </div>
+      <div className="flex justify-center mt-4">
+        <input
+          type="number"
+          value={currentPage}
+          onChange={handlePageInputChange}
+          className="w-12 text-center border rounded"
+        />
+        <span className="ml-2">
+          of {Math.ceil(totalData / itemsPerPage)}
+        </span>
       </div>
     </div>
   );

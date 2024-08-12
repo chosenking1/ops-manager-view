@@ -16,7 +16,7 @@ import ApiClient from '../../helpers/ApiClient';
 
 
 
-const ViewCustomer = () => {
+const ViewEnumeration = () => {
   axios.defaults.baseURL = apiUrl;
 
   const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
@@ -233,4 +233,4 @@ const ViewCustomer = () => {
 
 };
 
-export default ViewCustomer;
+export default ViewEnumeration;

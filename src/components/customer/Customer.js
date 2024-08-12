@@ -72,7 +72,6 @@ const Customer = () => {
       },
     });
     apiClient.fetchData();
-
   };
 
   const openPreferencesModal = () => {

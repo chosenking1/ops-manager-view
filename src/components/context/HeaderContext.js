@@ -9,7 +9,7 @@ const HeaderProvider = ({ children }) => {
   const populateHeader = (data) => {
     if (data && data.length > 0) {
       const extractedHeaders = Object.keys(data[0]).filter(
-        header => header !== 'id' && header !== 'emailConfirmed'
+        header => header !== 'id' && header !== 'emailConfirmed' && header !== 'staffMembers'
       );
       setHeaders(extractedHeaders);
     }

@@ -27,6 +27,9 @@ import UserManagement from './components/settings/user-management/UserManagement
 import { UtilityProvider } from './components/context/UtilityContext';
 import { HeaderProvider } from './components/context/HeaderContext';
 import ViewCustomer from './components/customer/ViewCustomer';
+import ViewEnumeration from './components/enumeration/ViewEnumeration';
+import CLWTeam from './components/teams/CLWTeam';
+import BHTETeam from './components/teams/BHTETeam';
 
 
 function App() {
@@ -68,7 +71,9 @@ function App() {
               <Route path="user-management" element={< UserManagement />} />
               <Route path="register" element={< RegisterUser />}/>
               <Route path="view-customer/:id" element={<ViewCustomer />} />
-              
+              <Route path="view-enumeration/:id" element={<ViewEnumeration />} />
+              <Route path="clw-team" element={<CLWTeam />} />
+              <Route path='bhte-team' element={<BHTETeam/>} />
             </Route>
           </Route>
 

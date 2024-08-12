@@ -18,7 +18,7 @@ import { MdOutlineSettings } from "react-icons/md";
 export const mainLinks = [
     // { name: "IBEDC", icon: logo, gap: true },
     { name: 'Dashboard', icon: MdOutlineDashboard, link: '/' },
-    { name: 'Customers', icon: HiUsers, link: '/customers' }, 
+    { name: "Customers", icon: HiUsers, link: '/customers' }, 
     { name: "Enumeration", icon: TiDocumentText, link: '/enumeration' },
     { name: "Meter Reading", icon: MdOutlineGasMeter, gap: true, link:'/meter-reading' },
     { name: "DT Meter Reading", icon: MdOutlineGasMeter, link:'/dt-meter-reading'},
@@ -43,8 +43,13 @@ export const mainLinks = [
     ...mainLinks,
     { name: 'User Management', link: '/user-management', belongsTo:'Settings' },
     { name: 'Add New User', link: '/register', belongsTo:'User Management' },
-    { name: 'View Customer', link: '/view-customer/:id', belongsTo:'Customers' },
-    { name: 'Contact', link: '#' },
-
+    { name: 'View Customer', link: 'view-customer/:id', belongsTo:'Customers' },
+    { name: 'View Enumeration', link: 'view-enumeration/:id', belongsTo:'Enumeration' },
+    { name: 'View Meter Reading', link: 'view-meter-reading/:id', belongsTo:'Meter Reading' },
+    { name: 'View Disconnection', link: 'view-disconnection/:id', belongsTo:'Disconnection' },
+    { name: 'View Reconnection', link: 'view-reconnection/:id', belongsTo:'Reconnection' },
+    { name: 'CLW Team', link: 'clw-team', },
+    { name: 'BHTE Team', link: 'bht-team',},
+    // {name: 'Create Team', link: 'create-team', },
     // Add more links for the Navbar as needed
   ];
