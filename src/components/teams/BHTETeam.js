@@ -13,6 +13,7 @@ import Table from '../../helpers/Table';
 import { UtilityContext } from '../context/UtilityContext';
 import { HeaderContext } from '../context/HeaderContext';
 import ApiClient from '../../helpers/ApiClient';
+import CreateNewTeam from './CreateNewTeam';
 
 
 
@@ -38,7 +39,8 @@ const BHTETeam = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-
+    const [openCreateTeam, setOpenCreateTeam] = useState(false)
+    const [users, setUsers] = useState('');
 
     useEffect(() => {
 
@@ -67,7 +69,7 @@ const BHTETeam = () => {
                 setIsLoading(false);
                 setCurrentPage(page);
                 setItemsPerPage(pageSize);
-                console.log('id', BHTETeam)
+                // console.log('id', BHTETeam)
 
             },
             onError: (error) => {
@@ -93,7 +95,62 @@ const BHTETeam = () => {
         fetchTeam(); // Re-fetch bill history to refresh data
     };
 
+    const openCreateTeamModal = () => {
+        setOpenCreateTeam(true);
+    };
+
+    const closeOpenCreateTeamModal = () => {
+        setOpenCreateTeam(false);
+    };
+
+    const saveBHTETeam = (teamData, membersData) => {
+        // Step 1: Call API to save CLW Team
+        const saveTeamClient = new ApiClient({
+            url: 'api/teams',
+            method: 'POST',
+            headers: {
+                'disco': 'root',
+            },
+            data: teamData,
+            onSuccess: (data) => {
+                console.log('BHTE Team saved successfully:', data);
     
+                // Step 2: Add members to the team created
+                const teamId = data.data; // Assuming `data.data` contains the `teamId`
+                const membersPayload = {
+                    teamId: teamId,
+                    staffMemberIds: membersData.staffMemberIds // Assuming `membersData` is an array of staff IDs
+                };
+    
+                const addMembersClient = new ApiClient({
+                    url: `api/teams/add-member`,
+                    method: 'PUT',
+                    headers: {
+                        'disco': 'root',
+                    },
+                    data: membersPayload,
+                    onSuccess: (memberData) => {
+                        console.log('Members added successfully:', memberData);
+    
+                        // Optional: Close the form and refresh team list
+                        closeOpenCreateTeamModal();
+                        fetchTeam();
+                    },
+                    onError: (error) => {
+                        console.error('Error adding members:', error);
+                    }
+                });
+    
+                addMembersClient.fetchData(); // Execute the request to add members
+            },
+            onError: (error) => {
+                console.error('Error saving BHTE Team:', error);
+            }
+        });
+    
+        saveTeamClient.fetchData(); // Execute the request to save the team
+    };
+
 
     return (
         <div className="flex m-6 bg-white flex-col">
@@ -102,6 +159,7 @@ const BHTETeam = () => {
                 <p className=' w-full text-xl font-semibold text-mygard-1'>Team List</p>
                 <div className='flex w-full place-content-end place'>
                     <button
+                        onClick={openCreateTeamModal}
                         className="flex place-content-center place-items-center h-full w-full max-w-[139px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
                         <div className='mr-1 text-lg'><IoAddCircle /></div>
                         Create Team
@@ -139,6 +197,8 @@ const BHTETeam = () => {
                     </button> */}
                 </div>
             </div>
+
+            <CreateNewTeam isOpen={openCreateTeam} onClose={closeOpenCreateTeamModal} technicalStaffs={users} createTeam={saveBHTETeam} />
 
             <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 

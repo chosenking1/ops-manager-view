@@ -45,7 +45,7 @@ const ViewCustomer = () => {
   }, [id]);
 
   useEffect(() => {
-
+    // fetchCustomer()
     fetchBillHistory(currentPage, itemsPerPage);
 
   }, [currentPage, itemsPerPage]);

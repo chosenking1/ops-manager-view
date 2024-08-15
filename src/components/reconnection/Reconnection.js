@@ -79,6 +79,14 @@ const Reconnection = () => {
     fetchReconnection();
   };
 
+  const clwTeam = ()=> {
+    navigate('/clw-team');
+  };
+
+  const bhteTeam = ()=> {
+    navigate('/bhte-team');
+  };
+
   return (
     <div className="flex m-6 bg-white flex-col">
 
@@ -108,9 +116,32 @@ const Reconnection = () => {
         </table>
       </div>
 
-      <div className="p-4 flex w-full h-20 justify-content justify-between">
-        <p className='w-full text-xl font-semibold text-mygard-1'>Reconnection List</p>
-        <div className='flex w-full place-content-end'>
+      <div className="p-4 flex h-20 justify-content justify-between">
+        <p className=' text-xl font-semibold text-mygard-1'>Reconnection List</p>
+        <div className='flex  justify-between'>
+          <button
+            onClick={clwTeam}
+            className=" place-content-center place-items-center h-full w-full max-w-[123px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            CLW Team
+          </button>
+
+          <button
+            className=" place-content-center place-items-center h-full w-full max-w-[275px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            Upload Customers to Reconnect
+          </button>
+
+          <button
+            className=" place-content-center place-items-center h-full w-full max-w-[216px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            Log Reconnection Request
+          </button>
+
+          <button
+            onClick={bhteTeam}
+            className=" place-content-center place-items-center h-full w-full max-w-[101px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
+            BHTE Team
+          </button>
+
+
           <button
             className=" place-content-center place-items-center h-full w-full max-w-[128px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
             Download CSV
@@ -125,7 +156,7 @@ const Reconnection = () => {
         </div>
       </div>
 
-      <div className='flex mb-6' >
+      <div className='flex justify-between' >
 
         <div className="relative">
           <input className='m-2 p-4 pl-12 pr-4 text-sm text-gray-900 border border-light-gray rounded-lg dark:placeholder-light-gray dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Search' />

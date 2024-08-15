@@ -29,7 +29,7 @@ const CLWTeam = () => {
     // const { id } = parameters;
     const location = useLocation();
     const navigate = useNavigate();
-    const [ createTeam, setCreateTeam] = useState(false)
+    const [openCreateTeam, setOpenCreateTeam] = useState(false)
     const [users, setUsers] = useState('');
 
 
@@ -47,31 +47,31 @@ const CLWTeam = () => {
         fetchUsers()
     }, [currentPage, itemsPerPage]);
 
-    const fetchUsers = async(page = currentPage, pageSize = itemsPerPage) => {
+    const fetchUsers = async (page = currentPage, pageSize = itemsPerPage) => {
         setIsLoading(true);
         const apiClient = new ApiClient({
-          url: '/api/users',
-          headers: {
-            'disco': 'root',
-          },
-          params: {
-            'pageNumber': page,
-            'pageSize': pageSize,
-          },
-          onSuccess: (data) => {
-            setUsers(data.data.data);
-            
-            setIsLoading(false);
-            
-          },
-          onError: (error) => {
-            console.error('Error fetching Users:', error);
-            setIsLoading(false);
-          },
+            url: '/api/users',
+            headers: {
+                'disco': 'root',
+            },
+            params: {
+                'pageNumber': page,
+                'pageSize': pageSize,
+            },
+            onSuccess: (data) => {
+                setUsers(data.data.data);
+
+                setIsLoading(false);
+
+            },
+            onError: (error) => {
+                console.error('Error fetching Users:', error);
+                setIsLoading(false);
+            },
         });
         apiClient.fetchData();
-          
-      };
+
+    };
 
     const fetchTeam = (page = currentPage, pageSize = itemsPerPage) => {
         setIsLoading(true);
@@ -92,7 +92,7 @@ const CLWTeam = () => {
                 setIsLoading(false);
                 setCurrentPage(page);
                 setItemsPerPage(pageSize);
-                console.log('id', CLWTeam)
+                // console.log('id', CLWTeam)
 
             },
             onError: (error) => {
@@ -118,13 +118,62 @@ const CLWTeam = () => {
         fetchTeam(); // Re-fetch bill history to refresh data
     };
 
-    const openCreateTeam = () => {
-        setCreateTeam(true);
+    const openCreateTeamModal = () => {
+        setOpenCreateTeam(true);
     };
 
-    const closeCreateTeam = () => {
-        setCreateTeam(false);
+    const closeOpenCreateTeamModal = () => {
+        setOpenCreateTeam(false);
     };
+
+    const saveCLWTeam = (teamData, membersData) => {
+        // Step 1: Call API to save CLW Team
+        const saveTeamClient = new ApiClient({
+            url: 'api/teams',
+            method: 'POST',
+            headers: {
+                'disco': 'root',
+            },
+            data: teamData,
+            onSuccess: (data) => {
+                console.log('CLW Team saved successfully:', data);
+    
+                // Step 2: Add members to the team created
+                const teamId = data.data; // Assuming `data.data` contains the `teamId`
+                const membersPayload = {
+                    teamId: teamId,
+                    staffMemberIds: membersData.staffMemberIds // Assuming `membersData` is an array of staff IDs
+                };
+    
+                const addMembersClient = new ApiClient({
+                    url: `api/teams/add-member`,
+                    method: 'PUT',
+                    headers: {
+                        'disco': 'root',
+                    },
+                    data: membersPayload,
+                    onSuccess: (memberData) => {
+                        console.log('Members added successfully:', memberData);
+    
+                        // Optional: Close the form and refresh team list
+                        closeOpenCreateTeamModal();
+                        fetchTeam();
+                    },
+                    onError: (error) => {
+                        console.error('Error adding members:', error);
+                    }
+                });
+    
+                addMembersClient.fetchData(); // Execute the request to add members
+            },
+            onError: (error) => {
+                console.error('Error saving CLW Team:', error);
+            }
+        });
+    
+        saveTeamClient.fetchData(); // Execute the request to save the team
+    };
+    
 
 
     return (
@@ -134,7 +183,7 @@ const CLWTeam = () => {
                 <p className=' w-full text-xl font-semibold text-mygard-1'>Team List</p>
                 <div className='flex w-full place-content-end place'>
                     <button
-                        onClick={openCreateTeam}
+                        onClick={openCreateTeamModal}
                         className="flex place-content-center place-items-center h-full w-full max-w-[139px] max-h-12 text-[#003057] border border-[#003057] rounded-lg text-sm font-semibold hover:bg-violet-600 hover:text-white active:bg-indigo-500 focus:outline-none focus:ring">
                         <div className='mr-1 text-lg'><IoAddCircle /></div>
                         Create Team
@@ -172,7 +221,7 @@ const CLWTeam = () => {
                     </button> */}
                 </div>
             </div>
-            <CreateNewTeam isOpen={createTeam} onClose={closeCreateTeam} clws={users}/>
+            <CreateNewTeam isOpen={openCreateTeam} onClose={closeOpenCreateTeamModal} technicalStaffs={users} createTeam={saveCLWTeam}/>
             <PreferenceModal isOpen={isPreferencesModalOpen} onClose={closePreferencesModal} headers={headers.map(formatHeader)} onSave={savePreferences} />
 
             <div className="px-3 overflow-x-auto">
